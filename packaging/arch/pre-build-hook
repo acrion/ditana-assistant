@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+target_dir=$(pwd)
+cd ../..
+tar -czvf "$target_dir/wheel-sources.tar.gz" \
+    pyproject.toml \
+    poetry.lock \
+    ditana_assistant/ \
+    ditana-assistant \
+    README.md

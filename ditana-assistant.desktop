@@ -1,0 +1,11 @@
+[Desktop Entry]
+
+Name=Ditana Assistant
+GenericName=AI Assistant
+Icon=/usr/share/icons/hicolor/256x256/apps/ditana-assistant.png
+Type=Application
+Exec=/usr/bin/ditana-assistant --gui
+StartupNotify=false
+Terminal=true
+NoDisplay=false
+Categories=Office;

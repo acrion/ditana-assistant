@@ -1,0 +1,9 @@
+pkg
+*.zst
+*.zst.sig
+*.whl
+__pycache__
+.idea
+tmp
+test.sh
+requirements.txt

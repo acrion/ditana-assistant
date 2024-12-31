@@ -1,0 +1,47 @@
+# Maintainer: Stefan Zipproth <s.zipproth@ditana.org>
+# Author: Stefan Zipproth <s.zipproth@ditana.org>
+
+pkgname=ditana-assistant
+pkgver=$(grep '^version\s*=\s*' ../../pyproject.toml | sed 's/^version\s*=\s*"\(.*\)"$/\1/')
+pkgrel=1
+pkgdesc="$(grep '^description\s*=\s*' ../../pyproject.toml | sed 's/^description\s*=\s*"\(.*\)"$/\1/')"
+arch=(any)
+url="https://github.com/acrion/ditana-assistant"
+license=('AGPL-3.0-or-later AND PSF-2.0 AND BSD-3-Clause AND Apache-2.0 AND MIT AND GPL')
+conflicts=()
+depends=(python python-pywebview python-requests python-platformdirs wmctrl)
+makedepends=(gzip python-poetry)
+source=(
+    "file://$(pwd)/../../ditana-assistant.desktop"
+    "file://$(pwd)/../../ditana-assistant.png"
+    "file://$(pwd)/../../ditana-assistant.1"
+    "file://$(pwd)/../../LICENSE"
+    "file://${pwd}/wheel-sources.tar.gz"
+)
+
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+build() {
+    tar --no-same-owner --preserve-permissions -xzf "$srcdir/wheel-sources.tar.gz" -C ./
+    echo "Current directory : $(pwd)"
+    poetry build -f wheel
+    echo "Built wheel:"
+    ls dist/*.whl
+}
+
+package() {
+    # Install the wheel into the package directory
+    python -m installer --destdir="$pkgdir" dist/*.whl
+
+    # Install additional files
+    install -Dm644 "ditana-assistant.desktop" "$pkgdir/usr/share/applications/ditana-assistant.desktop"
+    install -Dm644 "ditana-assistant.png"     "$pkgdir/usr/share/icons/hicolor/256x256/apps/ditana-assistant.png"
+    install -Dm644 "ditana-assistant.1"       "$pkgdir/usr/share/man/man1/ditana-assistant.1"
+    install -Dm644 "LICENSE"             "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

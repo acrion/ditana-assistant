@@ -1,0 +1,67 @@
+.TH DITANA-ASSISTANT 1 "September 2024" "Version 1.031" "User Commands"
+.SH NAME
+ditana-assistant \- AI-powered command-line and GUI assistant
+.SH SYNOPSIS
+.B ditana-assistant
+[\fB\-h\fR]
+[\fB\-e\fR]
+[\fB\-u\fR]
+[\fB\-n\fR]
+[\fI\,task\/\fR]
+.SH DESCRIPTION
+.B ditana-assistant
+is an AI-powered application that combines a command-line interface with optional GUI functionality. It leverages Large Language Models (LLMs) to provide intelligent assistance for various tasks, including system management, file operations, and command generation.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Show this help message and exit
+.TP
+.BR \-e ", " \-\-english
+Force output in English language
+.TP
+.BR \-u ", " \-\-gui
+Display a graphical dialog
+.TP
+.BR \-n ", " \-\-non\-interactive
+Run in non-interactive mode (no further user input expected)
+.TP
+.I task
+The task for the assistant (optional)
+.SH CONFIGURATION
+Configuration is stored in \fI~/.config/ditana-assistant/config.yaml\fR. Available options:
+.TP
+.B model_type
+Set to 'gemma' (default) or 'openai'
+.TP
+.B openai_model
+Specify OpenAI model (e.g., 'gpt-4o-mini') when using OpenAI
+.TP
+.B show_debug_messages
+Set to 'true' or 'false' to enable/disable debug messages
+.PP
+When using OpenAI, set the \fBOPENAI_API_KEY\fR environment variable with your API key.
+.SH EXAMPLES
+.TP
+Run in command-line mode:
+.B ditana-assistant "What are the largest files in the current directory?"
+.TP
+Run in GUI mode:
+.B ditana-assistant -u
+.TP
+Run in English, non-interactive mode:
+.B ditana-assistant -e -n "Summarize the contents of log.txt"
+.SH NOTES
+The assistant may suggest terminal commands, which are only executed after user confirmation. Due to the use of LLMs, there's a possibility of errors. Always review suggested commands before execution.
+.SH AUTHOR
+Written by Stefan Zipproth <s.zipproth@acrion.ch>, acrion innovations GmbH, Switzerland.
+.SH BUGS
+Report bugs to <https://github.com/acrion/ditana-assistant/issues>
+.SH COPYRIGHT
+Copyright \(co 2024 Stefan Zipproth, acrion innovations GmbH, Switzerland. License AGPLv3+: GNU AGPL version 3 or later <https://www.gnu.org/licenses/agpl-3.0.html>.
+This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.
+.PP
+For additional licensing options, visit <https://acrion.ch/sales>.
+.SH SEE ALSO
+Full documentation at: <https://github.com/acrion/ditana-assistant>
+.PP
+For optimal performance with the default Gemma LLM, consider installing the \fBditana-koboldcpp\fR package from the AUR, which provides a pre-configured koboldcpp server.

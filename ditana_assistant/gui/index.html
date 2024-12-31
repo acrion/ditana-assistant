@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+Copyright (c) 2024, 2025 acrion innovations GmbH
+Authors: Stefan Zipproth, s.zipproth@acrion.ch
+
+This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
+
+Ditana Assistant is offered under a commercial and under the AGPL license.
+For commercial licensing, contact us at https://acrion.ch/sales. For AGPL licensing, see below.
+
+AGPL licensing:
+
+Ditana Assistant is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Ditana Assistant is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with Ditana Assistant. If not, see <https://www.gnu.org/licenses/>.
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ditana Assistant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            height: 100px;
+        }
+        img {
+            max-width: 80px;
+            height: auto;
+        }
+        #response-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+            overflow-y: auto;
+        }
+        #response {
+            flex: 1;
+            margin-bottom: 10px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #444;
+            padding: 10px;
+            overflow-y: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            cursor: text;
+        }
+        #input-container {
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+        }
+        #input {
+            margin-bottom: 10px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #444;
+            padding: 10px;
+            resize: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+        button {
+            background-color: #444;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 150px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        button:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
+        label {
+            color: #ffffff;
+        }
+        #processing-message {
+            color: #ffaa00;
+            margin-top: 10px;
+            height: 20px;
+            line-height: 20px;
+        }
+        .colored-italic {
+            color: #ffaa00;
+            font-style: italic;
+        }
+        #about-dialog {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .dialog-content {
+            background-color: #1e1e1e;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #444;
+            width: 80%;
+            max-width: 600px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="logo-container">
+        <img id="ditana-logo" src="ditana-logo.png" alt="Ditana Logo">
+    </div>
+
+    <div id="response-container">
+        <div id="response"></div>
+    </div>
+
+    <div id="input-container">
+        <label for="input">Your Request</label>
+        <textarea id="input" rows="5"></textarea>
+        <div class="button-container">
+            <button id="sendButton" onclick="sendInput()">Send</button>
+            <button id="aboutButton" onclick="openAboutDialog()">About</button>
+        </div>
+        <div id="processing-message"></div>
+    </div>
+
+    <div id="about-dialog">
+        <div class="dialog-content">
+            <span class="close" onclick="closeAboutDialog()">&times;</span>
+            <div id="about-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let isProcessing = false;
+        let versionInfo = "unknown";
+
+        // Custom renderer for marked
+        const renderer = new marked.Renderer();
+        renderer.em = function(text) {
+            return `<span class="colored-italic">${text}</span>`;
+        };
+
+        // Set the custom renderer
+        marked.setOptions({
+            renderer: renderer
+        });
+
+        function addMarkdownItalics(text) {
+            return text
+                .split('\n')
+                .map(line => line.trim() ? `_${line.trim()}_` : line)
+                .join('\n');
+        }
+
+        function sendInput() {
+            if (isProcessing) {
+                alert("Please wait, your previous request is still being processed.");
+                return;
+            }
+
+            var input = document.getElementById("input").value;
+
+            if (input.trim()) {
+                appendToResponse(addMarkdownItalics(input) + "\n\n");
+            }
+            else {
+                return;
+            }
+
+            isProcessing = true;
+            updateUIState();
+
+            window.pywebview.api.process_input_direct(input).then(function(response) {
+                appendToResponse(response + "\n\n");
+                isProcessing = false;
+                updateUIState();
+            }).catch(function(e) {
+                console.error("Error in process_input_direct:", e);
+                isProcessing = false;
+                updateUIState();
+            });
+
+            document.getElementById("input").value = "";
+        }
+
+        function appendToResponse(text) {
+            var responseDiv = document.getElementById("response");
+            responseDiv.innerHTML += marked.parse(text);
+            responseDiv.scrollTop = responseDiv.scrollHeight;
+        }
+
+        function updateUIState() {
+            const sendButton = document.getElementById("sendButton");
+            const processingMessage = document.getElementById("processing-message");
+            const inputArea = document.getElementById("input");
+
+            if (isProcessing) {
+                sendButton.disabled = true;
+                processingMessage.textContent = "Processing... Please wait.";
+                inputArea.disabled = true;
+            } else {
+                sendButton.disabled = false;
+                processingMessage.textContent = "";
+                inputArea.disabled = false;
+            }
+        }
+
+        document.getElementById("input").addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendInput();
+            }
+        });
+
+        function openAboutDialog() {
+            document.getElementById("about-dialog").style.display = "block";
+            document.getElementById("about-content").innerHTML = `
+                <h2>About Ditana Assistant</h2>
+                <p>Version: ${versionInfo}</p>
+                <p>Ditana Assistant is an innovative AI-powered application that combines a graphical user interface with terminal functionality and, optionally, introspective contextual augmentation via Wolfram|Alpha.</p>
+                <p>For detailed information about features, usage, and licensing, please visit:</p>
+                <p><a href="https://ditana.org/assistant" target="_blank">https://ditana.org/assistant</a></p>
+                <p>Copyright © 2024 Stefan Zipproth, acrion innovations GmbH, Switzerland</p>
+                <p><a href="https://acrion.ch" target="_blank">https://acrion.ch</a></p>
+            `;
+        }
+
+        function closeAboutDialog() {
+            document.getElementById("about-dialog").style.display = "none";
+        }
+
+        function setVersion(version) {
+            versionInfo = version;
+        }
+    </script>
+</body>
+</html>

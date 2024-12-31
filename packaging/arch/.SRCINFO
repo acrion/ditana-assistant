@@ -1,0 +1,26 @@
+pkgbase = ditana-assistant
+	pkgdesc = AI-powered assistant with GUI, capable of generating and executing terminal commands, offering optional contextual augmentation and Wolfram|Alpha integration
+	pkgver = 0.90.10
+	pkgrel = 1
+	url = https://github.com/acrion/ditana-assistant
+	arch = any
+	license = AGPL-3.0-or-later AND PSF-2.0 AND BSD-3-Clause AND Apache-2.0 AND MIT AND GPL
+	makedepends = gzip
+	makedepends = python-poetry
+	depends = python
+	depends = python-pywebview
+	depends = python-requests
+	depends = python-platformdirs
+	depends = wmctrl
+	source = file:///media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/packaging/arch/../../ditana-assistant.desktop
+	source = file:///media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/packaging/arch/../../ditana-assistant.png
+	source = file:///media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/packaging/arch/../../ditana-assistant.1
+	source = file:///media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/packaging/arch/../../LICENSE
+	source = file:///wheel-sources.tar.gz
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+
+pkgname = ditana-assistant

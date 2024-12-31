@@ -1,0 +1,6 @@
+*
+!PKGBUILD
+!*.install
+!pre-build-hook
+!.gitignore
+!.SRCINFO
