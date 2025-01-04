@@ -30,7 +30,6 @@ user language, and other system-specific details.
 """
 
 from datetime import datetime
-from zoneinfo import ZoneInfo
 import time
 import os
 import locale
@@ -344,7 +343,7 @@ def get_system_timezone():
         except OSError:
             pass
 
-    return str(datetime.now(ZoneInfo(time.tzname[0])).tzinfo)
+    return time.tzname[0]
 
 
 def generate_initial_context() -> str:

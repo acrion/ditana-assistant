@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ditana-assistant"
-version = "0.90.10"
+version = "0.90.13"
 description = "AI-powered assistant with GUI, capable of generating and executing terminal commands, offering optional contextual augmentation and Wolfram|Alpha integration"
 authors = ["Stefan Zipproth <s.zipproth@ditana.org>"]
 license = "AGPL-3.0-or-later"
@@ -15,7 +15,6 @@ platformdirs = ">=4.2.2"
 pywebview = ">=5.2"
 requests = ">=2.32.3"
 pyyaml = ">=6.0.2"
-tzdata = { version = "*", markers = "sys_platform == 'win32' or python_version < '3.9'" }
 pythonnet = { version = ">=3.0.4", markers = "sys_platform == 'win32'" }
 pywin32 = { version = ">=306", markers = "sys_platform == 'win32'" }
 psutil = { version = ">=6.0.0", markers = "sys_platform == 'win32'" }

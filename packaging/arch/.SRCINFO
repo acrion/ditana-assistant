@@ -1,6 +1,6 @@
 pkgbase = ditana-assistant
 	pkgdesc = AI-powered assistant with GUI, capable of generating and executing terminal commands, offering optional contextual augmentation and Wolfram|Alpha integration
-	pkgver = 0.90.10
+	pkgver = 0.90.13
 	pkgrel = 1
 	url = https://github.com/acrion/ditana-assistant
 	arch = any
