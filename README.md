@@ -914,6 +914,10 @@ Please note that while we strive for stability, Ditana Assistant is still evolvi
 We are committed to continuously improving Ditana Assistant’s performance, accuracy, and feature set.
 Your feedback and contributions are invaluable in this process.
 
+## Feedback and Support
+
+Your insights are crucial to shaping Ditana Assistant’s future. We invite you to share your feedback, report issues, and engage with other users in our [Ditana Assistant Discord channel](https://discord.gg/A3CdBXxush). Join our community to collaborate, ask questions, and stay updated with the latest developments.
+
 ## Licensing
 
 Ditana Assistant is dual-licensed:
@@ -927,5 +931,5 @@ For commercial licensing inquiries, please contact us at [https://acrion.ch/sale
 
 ## Author
 
-Copyright © 2024 Stefan Zipproth, acrion innovations GmbH, Switzerland
+Copyright © 2024, 2025 Stefan Zipproth, acrion innovations GmbH, Switzerland
 [https://ditana.org](https://ditana.org)
