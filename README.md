@@ -485,7 +485,7 @@ of the internal processes. While additional log outputs [can be enabled](#advanc
    - Ran the ARC-Challenge test multiple times (4) due to potential variations in LLM API responses.
 
 5. **Documentation and Transparency**:
-   - Complete test logs available for download [here](https://ditana.org/assistant/ica-benchmark-409f40f.log).
+   - Complete test logs available for download [here](https://ditana.org/docs/the-assistant/ica-benchmark-409f40f.log).
    - Logged subset of internal processes to provide an overview without cluttering output.
 
 #### Evaluation Methodology for Multiple-Choice Questions
