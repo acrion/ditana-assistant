@@ -3,6 +3,7 @@ set -e
 target_dir=$(pwd)
 cd ../..
 tar -czvf "$target_dir/wheel-sources.tar.gz" \
+    --exclude='__pycache__' \
     pyproject.toml \
     poetry.lock \
     ditana_assistant/ \
