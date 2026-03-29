@@ -1,5 +1,7 @@
 # Ditana Assistant
 
+[![CI Build](https://github.com/acrion/ditana-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/acrion/ditana-assistant/actions/workflows/ci.yml)
+
 Ditana Assistant is an innovative AI-powered application that combines a graphical user interface with terminal functionality and, optionally, Introspective Contextual Augmentation via Wolfram|Alpha. Even without Wolfram|Alpha, the Introspective Contextual Augmentation (ICA) enhances AI responses in many cases (see [Example Sessions](#example-sessions) for more details).
 
 It leverages Large Language Models (LLMs) to provide intelligent assistance similar to the native browser interfaces of AI service providers.
@@ -23,7 +25,7 @@ For complete sessions, see [Examples](#example-sessions).
 - **OS Interaction**: Capable of interacting with the operating system, suggesting and executing terminal commands upon user confirmation, see [example sessions](#terminal-command-generation-examples).
 - **Optional Wolfram|Alpha Integration**: Automatically attempts to augment the LLM’s context via communication with the official [Wolfram|Alpha Short Answers API](https://products.wolframalpha.com/short-answers-api/explorer).
 - **Introspective Contextual Augmentation (ICA)**: Enhances AI responses by automatically gathering and incorporating relevant contextual information through introspective reasoning.
-See [Introspective Contextual Augmentation](#introspective-contextual-augmentation-ica) for more details.
+  See [Introspective Contextual Augmentation](#introspective-contextual-augmentation-ica) for more details.
 - **Multi-Platform**: Runs on Linux, macOS, and Windows, adapting to each environment automatically by [collecting context of the running system](#assistance-based-on-your-specific-system).
 - **Dual-Mode Operation**: Functions both as a [GUI application](#gui-mode) and a stand-alone [terminal tool](#command-line-interface) for quick command generation and embedding of answers in scripts.
 - **Pastime Mode**: Engage in [human-like conversations](#pastime-mode) with an AI companion, optionally impersonating specific characters or personalities.
@@ -34,34 +36,34 @@ See [Introspective Contextual Augmentation](#introspective-contextual-augmentati
 <!-- toc -->
 
 - [Usage](#usage)
-  * [Command-line Interface](#command-line-interface)
-  * [GUI Mode](#gui-mode)
-  * [Pastime Mode](#pastime-mode)
-  * [Intelligent Caching](#intelligent-caching)
+  - [Command-line Interface](#command-line-interface)
+  - [GUI Mode](#gui-mode)
+  - [Pastime Mode](#pastime-mode)
+  - [Intelligent Caching](#intelligent-caching)
 - [Installation](#installation)
-  * [Ditana GNU/Linux](#ditana-linux)
-  * [Arch Linux and Arch-based Distributions](#arch-linux-and-arch-based-distributions)
-  * [Other Linux Distributions, Windows, and macOS](#other-linux-distributions-windows-and-macos)
-  * [Prerequisites](#prerequisites)
+  - [Ditana GNU/Linux](#ditana-linux)
+  - [Arch Linux and Arch-based Distributions](#arch-linux-and-arch-based-distributions)
+  - [Other Linux Distributions, Windows, and macOS](#other-linux-distributions-windows-and-macos)
+  - [Prerequisites](#prerequisites)
 - [Configuration](#configuration)
-  * [Available Configuration Options:](#available-configuration-options)
-  * [Configuration Option Details](#configuration-option-details)
-  * [Using OpenAI](#using-openai)
-  * [Using Wolfram|Alpha](#using-wolframalpha)
+  - [Available Configuration Options:](#available-configuration-options)
+  - [Configuration Option Details](#configuration-option-details)
+  - [Using OpenAI](#using-openai)
+  - [Using Wolfram|Alpha](#using-wolframalpha)
 - [Use Cases](#use-cases)
-  * [Maximizing the Underlying AI Model’s Potential](#maximizing-the-underlying-ai-models-potential)
-  * [Terminal Command Generation](#terminal-command-generation)
-  * [Assistance Based on Your Specific System](#assistance-based-on-your-specific-system)
-  * [All Use Cases of Wolfram|Alpha](#all-use-cases-of-wolframalpha)
-  * [Introspective Contextual Augmentation (ICA)](#introspective-contextual-augmentation-ica)
+  - [Maximizing the Underlying AI Model’s Potential](#maximizing-the-underlying-ai-models-potential)
+  - [Terminal Command Generation](#terminal-command-generation)
+  - [Assistance Based on Your Specific System](#assistance-based-on-your-specific-system)
+  - [All Use Cases of Wolfram|Alpha](#all-use-cases-of-wolframalpha)
+  - [Introspective Contextual Augmentation (ICA)](#introspective-contextual-augmentation-ica)
 - [Example Sessions](#example-sessions)
-  * [Terminal command generation examples](#terminal-command-generation-examples)
-  * [Introspective Contextual Augmentation (ICA) examples](#introspective-contextual-augmentation-ica-examples)
+  - [Terminal command generation examples](#terminal-command-generation-examples)
+  - [Introspective Contextual Augmentation (ICA) examples](#introspective-contextual-augmentation-ica-examples)
 - [Collaboration](#collaboration)
 - [Sponsorship](#sponsorship)
 - [Current Project Status](#current-project-status)
-  * [Platform Support](#platform-support)
-  * [Ongoing and Future Development](#ongoing-and-future-development)
+  - [Platform Support](#platform-support)
+  - [Ongoing and Future Development](#ongoing-and-future-development)
 - [Important Notes](#important-notes)
 - [Licensing](#licensing)
 - [Author](#author)
@@ -77,6 +79,7 @@ ditana-assistant [OPTIONS] [TASK]
 ```
 
 Options:
+
 - `-h`, `--help`: Show help message and exit.
 - `-v`, `--version`: Show the version of Ditana Assistant and exit.
 - `-u`, `--gui`: Display a graphical dialog.
@@ -167,6 +170,7 @@ Note: While Pastime mode is functional with the Gemma model, it performs best wi
 Ditana Assistant implements a sophisticated request caching system for both Wolfram|Alpha and LLM queries. This feature optimizes API usage and improves response times, especially for repeated or similar queries.
 
 Key aspects of the caching system:
+
 - Caches all outgoing requests to APIs.
 - Implements an intelligent lifetime management for cache entries.
 - Adapts cache lifetime based on the stability of responses.
@@ -191,6 +195,7 @@ In KoboldCpp operation mode, the assistant makes use of [Gemma’s prompt format
 For other platforms, including Windows and macOS, you can install Ditana Assistant from source using [Poetry](https://python-poetry.org):
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/acrion/ditana-assistant.git
    cd ditana-assistant
@@ -200,18 +205,19 @@ For other platforms, including Windows and macOS, you can install Ditana Assista
    ```bash
    pip install poetry
    ```
-   
 3. Install ditana-assistant’s dependencies:
+
    ```bash
    poetry install
    ```
+
    This command will create a virtual environment (if one does not already exist) and install all dependencies listed in the `pyproject.toml` file.
    To execute ditana-assistant, you need to spawn a shell within the virtual environment with this command:
 
    ```bash
    poetry shell
    ```
-   
+
    The dependencies include either an [OpenAI API key](https://platform.openai.com/account/api-keys) or a local [KoboldCpp server](https://github.com/LostRuins/koboldcpp/wiki).
    For the latter, please consider using Google’s [Gemma LLM](https://ai.google.dev/gemma) ([Download](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q6_K.gguf)),
    as Ditana Assistant utilizes [Gemma’s Instruct Tag Format](https://ai.google.dev/gemma/docs/formatting).
@@ -255,18 +261,18 @@ The Ditana Assistant configuration is stored in a YAML file located at:
 assume_english: false
 enable_experimental_features: false
 generate_terminal_cmd: true
-koboldcpp_base_url: http://localhost:5001  # when using Gemma
+koboldcpp_base_url: http://localhost:5001 # when using Gemma
 model_cache_size: 20
 model_cache_start_lifetime_sec: 604800
 model_type: gemma # or 'openai'
 offer_cmd_execution: true
-openai_model: gpt-4o-mini  # when using OpenAI
+openai_model: gpt-4o-mini # when using OpenAI
 show_debug_messages: false
 wolfram_alpha_cache_size: 1
 wolfram_alpha_cache_start_lifetime_sec: 675
 wolfram_alpha_error_cache_size: 1
 wolfram_alpha_error_cache_start_lifetime_sec: 604800
-wolfram_alpha_short_answers_app_id: '' # https://developer.wolframalpha.com
+wolfram_alpha_short_answers_app_id: "" # https://developer.wolframalpha.com
 ```
 
 ### Configuration Option Details
@@ -274,7 +280,7 @@ wolfram_alpha_short_answers_app_id: '' # https://developer.wolframalpha.com
 #### Core Functionality Settings
 
 - `model_type`: Specifies the AI model to use. Currently, `gemma` for KoboldCpp and `openai` for OpenAI models are supported. Also see [Using OpenAI](#using-openai).
-Default: `gemma` (requires local [KoboldCpp server](#prerequisites))
+  Default: `gemma` (requires local [KoboldCpp server](#prerequisites))
 
 - `koboldcpp_base_url`: The base URL of the KoboldCpp server, used when `model_type` is set to `gemma`. Default: `http://localhost:5001`
 
@@ -288,8 +294,8 @@ Default: `gemma` (requires local [KoboldCpp server](#prerequisites))
 
 #### Advanced Configuration
 
-- `assume_english`: If set to true, the assistant will assume all text is in English without performing language detection. 
-Language detection is only used for specific use cases such as Wolfram|Alpha or internal meta-requests that need to be combined with the user prompt. Default: `false`.
+- `assume_english`: If set to true, the assistant will assume all text is in English without performing language detection.
+  Language detection is only used for specific use cases such as Wolfram|Alpha or internal meta-requests that need to be combined with the user prompt. Default: `false`.
 
 - `enable_experimental_features`: Activates experimental features for development and testing purposes. This is intended for internal use to systematically test new functionalities. Use with caution as features are still in development. Default: `false`.
 
@@ -312,7 +318,8 @@ Language detection is only used for specific use cases such as Wolfram|Alpha or 
 Set the `OPENAI_API_KEY` environment variable with your [OpenAI API key](https://platform.openai.com/account/api-keys) when configuring OpenAI models (see below config entries `model_type` and `openai_model`).
 As of October 2024, gpt-4o-mini is a factor of 20 cheaper than gpt-3.5-turbo: [$0.150 / 1M input tokens](https://openai.com/api/pricing).
 According to [https://platform.openai.com/docs/models/gpt-3-5-turbo](https://platform.openai.com/docs/models/gpt-3-5-turbo):
-  > "As of July 2024, gpt-4o-mini should be used in place of gpt-3.5-turbo, as it is cheaper, more capable, multimodal, and just as fast. gpt-3.5-turbo is still available for use in the API."
+
+> "As of July 2024, gpt-4o-mini should be used in place of gpt-3.5-turbo, as it is cheaper, more capable, multimodal, and just as fast. gpt-3.5-turbo is still available for use in the API."
 
 Note that the number of API accesses is reduced by Ditana Assistant’s sophisticated [caching algorithm](#intelligent-caching).
 
@@ -320,8 +327,8 @@ Note that the number of API accesses is reduced by Ditana Assistant’s sophisti
 
 Obtain an App ID by creating a "Short Answers API Key" on https://developer.wolframalpha.com and set the config entry `wolfram_alpha_short_answers_app_id` to its value.
 Make sure to select `Short Answers API` in the dialog:  
-<img src="wolfram_alpha_short_answers_api_key.png" alt="Wolfram Alpha Short Answers API Key" width="50%" height="50%">  
-  
+<img src="wolfram_alpha_short_answers_api_key.png" alt="Wolfram Alpha Short Answers API Key" width="50%" height="50%">
+
 Currently, 2000 accesses per month [are free](https://products.wolframalpha.com/api).
 Note that the number of API accesses is reduced by Ditana Assistant’s sophisticated [caching algorithm](#intelligent-caching).
 
@@ -513,10 +520,10 @@ This method capitalizes on the structured nature of multiple-choice answers and 
 Key aspects of this approach include:
 
 1. **Answer Choice Labeling**: The method ensures that answer choices begin with "B" rather than "A".
-This is crucial because "A" frequently appears as an article in English text, whereas "B", "C", "D", etc., are less likely to appear as standalone words.
+   This is crucial because "A" frequently appears as an article in English text, whereas "B", "C", "D", etc., are less likely to appear as standalone words.
 
 2. **Response Parsing**: The LLM’s response is analyzed for the presence of valid answer choice labels (e.g., "B", "C", "D") as whole words.
-This approach significantly reduces false positives compared to more complex semantic analysis methods.
+   This approach significantly reduces false positives compared to more complex semantic analysis methods.
 
 3. **Validation Criteria**:
    - A response is considered valid if exactly one answer choice label is present.
@@ -569,40 +576,42 @@ By leveraging these techniques and continual refinement, the ICA feature ensures
 
 In this session, the user first inquires about the largest files in the current directory, then asks for suggestions on which of these might be deleted.
 This example demonstrates that:
- - The assistant can provide ready-to-use terminal commands, including command chaining.
- - The assistant can analyze the output of invoked tools, supported by an automatic [contextual query](#maximizing-the-underlying-ai-models-potential).
 
-> ```bash  
+- The assistant can provide ready-to-use terminal commands, including command chaining.
+- The assistant can analyze the output of invoked tools, supported by an automatic [contextual query](#maximizing-the-underlying-ai-models-potential).
+
+> ```bash
 > ❯ ./ditana-assistant -a "What are the largest files in the current directory and below?"
->                                     is English: "What are the largest files in the current directory and below?"  
->                           refers to a computer: "What are the largest files in the current directory and below?"  
->   
-> find . -type f -exec du -h {} + | sort -rh | head -n 10  
-> Execute above command? (y/n) y  
-> 364K	./packaging/arch/ditana-assistant-1.036-1-any.pkg.tar.zst  
-> 284K	./src/ditana-logo.png  
-> 284K	./packaging/arch/pkg/ditana-assistant/usr/share/ditana/assistant/ditana-logo.png  
-> 284K	./packaging/arch/ditana-logo.png  
-> 276K	./.git/objects/21/e3382f3ee049d91368ce79218cb4049bae6222  
-> 248K	./myenv/lib/python3.12/site-packages/__pycache__/bottle.cpython-312.pyc  
-> 248K	./myenv/bin/__pycache__/bottle.cpython-312.pyc  
-> 204K	./myenv/lib/python3.12/site-packages/pip/_vendor/rich/__pycache__/_emoji_codes.cpython-312.pyc  
-> 160K	./myenv/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__pycache__/__init__.cpython-312.pyc  
-> 156K	./myenv/lib/python3.12/site-packages/pip/_vendor/idna/__pycache__/uts46data.cpython-312.pyc  
->   
-> Your Message ('enter' to quit): Which one of these are safe to delete?  
->                                     is English: "Which one of these are safe to delete?"  
->                   does not refer to a computer: "Which one of these are safe to delete?"  
->                 not suitable for Wolfram|Alpha: "Which one of these are safe to delete?"  
->                               contextual query: "Which file in the list has the smallest size and can be safely deleted?"  
->        Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."  
->                     answer to contextual query: "The file with the smallest size in the list is:  ./myenv/lib/python3.12/site-packages/pip/_vendor..."  
-> ```  
+>                                     is English: "What are the largest files in the current directory and below?"
+>                           refers to a computer: "What are the largest files in the current directory and below?"
+>
+> find . -type f -exec du -h {} + | sort -rh | head -n 10
+> Execute above command? (y/n) y
+> 364K	./packaging/arch/ditana-assistant-1.036-1-any.pkg.tar.zst
+> 284K	./src/ditana-logo.png
+> 284K	./packaging/arch/pkg/ditana-assistant/usr/share/ditana/assistant/ditana-logo.png
+> 284K	./packaging/arch/ditana-logo.png
+> 276K	./.git/objects/21/e3382f3ee049d91368ce79218cb4049bae6222
+> 248K	./myenv/lib/python3.12/site-packages/__pycache__/bottle.cpython-312.pyc
+> 248K	./myenv/bin/__pycache__/bottle.cpython-312.pyc
+> 204K	./myenv/lib/python3.12/site-packages/pip/_vendor/rich/__pycache__/_emoji_codes.cpython-312.pyc
+> 160K	./myenv/lib/python3.12/site-packages/pip/_vendor/pkg_resources/__pycache__/__init__.cpython-312.pyc
+> 156K	./myenv/lib/python3.12/site-packages/pip/_vendor/idna/__pycache__/uts46data.cpython-312.pyc
+>
+> Your Message ('enter' to quit): Which one of these are safe to delete?
+>                                     is English: "Which one of these are safe to delete?"
+>                   does not refer to a computer: "Which one of these are safe to delete?"
+>                 not suitable for Wolfram|Alpha: "Which one of these are safe to delete?"
+>                               contextual query: "Which file in the list has the smallest size and can be safely deleted?"
+>        Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."
+>                     answer to contextual query: "The file with the smallest size in the list is:  ./myenv/lib/python3.12/site-packages/pip/_vendor..."
+> ```
+>
 > It is important to exercise caution when deleting files, especially system files or files related to applications. In the list provided,
-the file that appears to be safe to delete without causing any major issues is:  
+> the file that appears to be safe to delete without causing any major issues is:  
 > `./myenv/lib/python3.12/site-packages/pip/_vendor/idna/__pycache__/uts46data.cpython-312.pyc`  
 > This file seems to be a Python cache file and deleting it should not have a significant impact on the functionality of the application.
-However, it is always recommended to make a backup of the file before deleting it, in case it is needed later on.
+> However, it is always recommended to make a backup of the file before deleting it, in case it is needed later on.
 
 #### Terminal command example 2 (using gpt-3.5-turbo)
 
@@ -613,51 +622,52 @@ In this session, the user first inquires about the status of a service, then req
 - The assistant can deduce the specific name of the service with the help of [System-Specific Context](#assistance-based-on-your-specific-system) (on Windows or macOS, the answer is different).
 - The assistant can analyze the output of invoked tools, supported by an automatic [contextual query](#maximizing-the-underlying-ai-models-potential) (see the following log).
 
-> ```bash  
-> ❯ ./ditana-assistant -a "Is the network name resolution service running stably?"   
->                                     is English: "Is the network name resolution service running stably?"  
->                           refers to a computer: "Is the network name resolution service running stably?"  
->   
-> systemctl status systemd-resolved.service  
-> Execute above command? (y/n) y  
-> ● systemd-resolved.service - Network Name Resolution  
->      Loaded: loaded (/usr/lib/systemd/system/systemd-resolved.service; enabled; preset: enabled)  
->      Active: active (running) since Mon 2024-09-23 10:16:39 CEST; 3 days ago  
->  Invocation: 1e937e9c439a4fed968ce8d0e976e201  
->        Docs: man:systemd-resolved.service(8)  
->              man:org.freedesktop.resolve1(5)  
->              https://systemd.io/WRITING_NETWORK_CONFIGURATION_MANAGERS  
->              https://systemd.io/WRITING_RESOLVER_CLIENTS  
->    Main PID: 737 (systemd-resolve)  
->      Status: "Processing requests..."  
->       Tasks: 1 (limit: 154223)  
->      Memory: 11.8M (peak: 15M)  
->         CPU: 55.832s  
->      CGroup: /system.slice/systemd-resolved.service  
->              └─737 /usr/lib/systemd/systemd-resolved  
->   
-> Sep 23 10:16:39 akino systemd[1]: Starting Network Name Resolution...  
-> Sep 23 10:16:39 akino systemd-resolved[737]: Positive Trust Anchors:  
-> Sep 23 10:16:39 akino systemd-resolved[737]: . IN DS 20326 8 2 e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d  
-> Sep 23 10:16:39 akino systemd-resolved[737]: Negative trust anchors: home.arpa 10.in-addr.arpa 16.172.in-addr.arpa 17.172.in-addr.arpa 18.172.in-addr.arpa 19.172.in-addr.arpa 20.172.in-addr.arpa 21.172.in-addr.arpa 22.172.in-addr.arpa 23.172.in-addr.arpa 24.172.in-addr.arpa 25.172.in-addr.arpa 26.172.in-addr.arpa 27.172.in-addr.arpa 28.172.in-addr.arpa 29.172.in-addr.arpa 30.172.in-addr.arpa 31.172.in-addr.arpa 170.0.0.192.in-addr.arpa 171.0.0.192.in-addr.arpa 168.192.in-addr.arpa d.f.ip6.arpa …  
-> Sep 23 10:16:39 akino systemd-resolved[737]: Using system hostname 'akino'.  
-> Sep 23 10:16:39 akino systemd[1]: Started Network Name Resolution.  
-> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set search domain list to: fritz.box  
-> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set default route setting: yes  
-> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set DNS server list to: 192.168.178.1  
-> Hint: Some lines were ellipsized, use -l to show in full.  
->    
-> Your Message ('enter' to quit): Can you please summarize this?  
->                                     is English: "Can you please summarize this?"  
->                   does not refer to a computer: "Can you please summarize this?"  
->                 not suitable for Wolfram|Alpha: "Can you please summarize this?"  
->                               contextual query: "What is the total number of positive trust anchors listed in the output provided?"  
->        Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."  
->                     answer to contextual query: "There is a total of 1 positive trust anchor listed in the output provided."  
-> ```  
+> ```bash
+> ❯ ./ditana-assistant -a "Is the network name resolution service running stably?"
+>                                     is English: "Is the network name resolution service running stably?"
+>                           refers to a computer: "Is the network name resolution service running stably?"
+>
+> systemctl status systemd-resolved.service
+> Execute above command? (y/n) y
+> ● systemd-resolved.service - Network Name Resolution
+>      Loaded: loaded (/usr/lib/systemd/system/systemd-resolved.service; enabled; preset: enabled)
+>      Active: active (running) since Mon 2024-09-23 10:16:39 CEST; 3 days ago
+>  Invocation: 1e937e9c439a4fed968ce8d0e976e201
+>        Docs: man:systemd-resolved.service(8)
+>              man:org.freedesktop.resolve1(5)
+>              https://systemd.io/WRITING_NETWORK_CONFIGURATION_MANAGERS
+>              https://systemd.io/WRITING_RESOLVER_CLIENTS
+>    Main PID: 737 (systemd-resolve)
+>      Status: "Processing requests..."
+>       Tasks: 1 (limit: 154223)
+>      Memory: 11.8M (peak: 15M)
+>         CPU: 55.832s
+>      CGroup: /system.slice/systemd-resolved.service
+>              └─737 /usr/lib/systemd/systemd-resolved
+>
+> Sep 23 10:16:39 akino systemd[1]: Starting Network Name Resolution...
+> Sep 23 10:16:39 akino systemd-resolved[737]: Positive Trust Anchors:
+> Sep 23 10:16:39 akino systemd-resolved[737]: . IN DS 20326 8 2 e06d44b80b8f1d39a95c0b0d7c65d08458e880409bbc683457104237c7f8ec8d
+> Sep 23 10:16:39 akino systemd-resolved[737]: Negative trust anchors: home.arpa 10.in-addr.arpa 16.172.in-addr.arpa 17.172.in-addr.arpa 18.172.in-addr.arpa 19.172.in-addr.arpa 20.172.in-addr.arpa 21.172.in-addr.arpa 22.172.in-addr.arpa 23.172.in-addr.arpa 24.172.in-addr.arpa 25.172.in-addr.arpa 26.172.in-addr.arpa 27.172.in-addr.arpa 28.172.in-addr.arpa 29.172.in-addr.arpa 30.172.in-addr.arpa 31.172.in-addr.arpa 170.0.0.192.in-addr.arpa 171.0.0.192.in-addr.arpa 168.192.in-addr.arpa d.f.ip6.arpa …
+> Sep 23 10:16:39 akino systemd-resolved[737]: Using system hostname 'akino'.
+> Sep 23 10:16:39 akino systemd[1]: Started Network Name Resolution.
+> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set search domain list to: fritz.box
+> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set default route setting: yes
+> Sep 23 10:16:43 akino systemd-resolved[737]: enp5s0: Bus client set DNS server list to: 192.168.178.1
+> Hint: Some lines were ellipsized, use -l to show in full.
+>
+> Your Message ('enter' to quit): Can you please summarize this?
+>                                     is English: "Can you please summarize this?"
+>                   does not refer to a computer: "Can you please summarize this?"
+>                 not suitable for Wolfram|Alpha: "Can you please summarize this?"
+>                               contextual query: "What is the total number of positive trust anchors listed in the output provided?"
+>        Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."
+>                     answer to contextual query: "There is a total of 1 positive trust anchor listed in the output provided."
+> ```
+>
 > The output shows that the systemd-resolved service is active and running stably since September 23, 2024.
-It is processing requests and has a main PID of 737. The service is managing network name resolution and has a positive trust anchor listed.
-The system hostname is 'akino' and the service has set search domain list and DNS server list for the network interface enp5s0.
+> It is processing requests and has a main PID of 737. The service is managing network name resolution and has a positive trust anchor listed.
+> The system hostname is 'akino' and the service has set search domain list and DNS server list for the network interface enp5s0.
 
 ### Introspective Contextual Augmentation (ICA) examples
 
@@ -674,23 +684,26 @@ The second response, with [ICA](#maximizing-the-underlying-ai-models-potential) 
 
 ##### Without ICA (default)
 
-> ```bash  
-> ❯ ./ditana-assistant "What should I wear today for a travel to New York?"  
->                                     is English: "What should I wear today for a travel to New York?"  
->                   does not refer to a computer: "What should I wear today for a travel to New York?"  
->                 not suitable for Wolfram|Alpha: "What should I wear today for a travel to New York?"  
-> ```  
+> ```bash
+> ❯ ./ditana-assistant "What should I wear today for a travel to New York?"
+>                                     is English: "What should I wear today for a travel to New York?"
+>                   does not refer to a computer: "What should I wear today for a travel to New York?"
+>                 not suitable for Wolfram|Alpha: "What should I wear today for a travel to New York?"
+> ```
+>
 > I recommend wearing comfortable and stylish clothing for your travel to New York. Since it's September, you may want to consider layering options as the weather can be unpredictable. A light jacket or sweater, comfortable jeans or pants, and comfortable shoes for walking are good choices. Don't forget to check the weather forecast for New York to ensure you are prepared for any conditions. Safe travels!
 
 ##### With ICA
-> ```bash  
-> ❯ ./ditana-assistant -a "What should I wear today for a travel to New York?"  
->                                     is English: "What should I wear today for a travel to New York?"  
->                   does not refer to a computer: "What should I wear today for a travel to New York?"  
->                 not suitable for Wolfram|Alpha: "What should I wear today for a travel to New York?"  
->                               contextual query: "What is the average temperature in New York City on September 26th, 2024?"  
->     Wolfram|Alpha’s answer to contextual query: "On Thursday, 26 September 2024, the mean temperature in New York City, United States, was 21 degr..."  
-> ```  
+
+> ```bash
+> ❯ ./ditana-assistant -a "What should I wear today for a travel to New York?"
+>                                     is English: "What should I wear today for a travel to New York?"
+>                   does not refer to a computer: "What should I wear today for a travel to New York?"
+>                 not suitable for Wolfram|Alpha: "What should I wear today for a travel to New York?"
+>                               contextual query: "What is the average temperature in New York City on September 26th, 2024?"
+>     Wolfram|Alpha’s answer to contextual query: "On Thursday, 26 September 2024, the mean temperature in New York City, United States, was 21 degr..."
+> ```
+>
 > For a trip to New York City on September 26th, 2024, you may want to wear comfortable clothing suitable for a temperature of around 21 degrees Celsius. It's always a good idea to bring layers, as the weather can change throughout the day. Additionally, consider bringing an umbrella or rain jacket as there may be a chance of rain. Enjoy your trip!
 
 #### ICA example 2 (using gemma-2-2b-it-Q6_K.gguf with adaptive contextual queries)
@@ -699,86 +712,93 @@ The second response, with [ICA](#maximizing-the-underlying-ai-models-potential) 
 
 A [detailed analysis by ChatGPT-o1](https://chatgpt.com/share/66f53751-4694-8009-ba49-5da7c2560253) on the quality of the following two responses shows that Ditana Assistant’s [ICA](#maximizing-the-underlying-ai-models-potential) can avoid fundamental errors in the output:
 
-> - Answer 2 is correct, and it demonstrates a proper understanding and application of trigonometric functions, with all intermediate steps accurately calculated.  
-> - Answer 1, while partially correct in its calculation, contains a **fundamental error** in explaining the trigonometric relationships and does not provide the final numerical value of the angle.  
+> - Answer 2 is correct, and it demonstrates a proper understanding and application of trigonometric functions, with all intermediate steps accurately calculated.
+> - Answer 1, while partially correct in its calculation, contains a **fundamental error** in explaining the trigonometric relationships and does not provide the final numerical value of the angle.
 
 See [public link to the comparison](https://chatgpt.com/share/66f53751-4694-8009-ba49-5da7c2560253) for the full picture.
 
 ##### Without ICA (default)
-> ```bash  
-> ❯ ./ditana-assistant "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meters from the wall. What is the angle between the ladder and the ground?"                   
->                                     is English: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."  
->                   does not refer to a computer: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."  
-> ```  
+
+> ```bash
+> ❯ ./ditana-assistant "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meters from the wall. What is the angle between the ladder and the ground?"
+>                                     is English: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."
+>                   does not refer to a computer: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."
+> ```
+>
 > Here's how to solve this problem using trigonometry:
-> 
-> **Understanding the Problem**  
-> * We have a right triangle formed by the ladder, the wall, and the ground.  
-> * The ladder is the hypotenuse (the longest side).  
-> * The distance from the wall to the base of the ladder is one leg.  
-> * The angle between the ladder and the ground is what we need to find.
-> 
+>
+> **Understanding the Problem**
+>
+> - We have a right triangle formed by the ladder, the wall, and the ground.
+> - The ladder is the hypotenuse (the longest side).
+> - The distance from the wall to the base of the ladder is one leg.
+> - The angle between the ladder and the ground is what we need to find.
+>
 > **Using Trigonometry**  
-> The trigonometric function that relates the opposite side, adjacent side, and hypotenuse is the **tangent** (tan).  
-> * **tan(angle) = opposite / adjacent**  
-> **Applying the Information**  
-> 1. **Opposite:** The ladder reaches 4 meters up the wall, so the opposite side is 4 meters.  
+> The trigonometric function that relates the opposite side, adjacent side, and hypotenuse is the **tangent** (tan).
+>
+> - **tan(angle) = opposite / adjacent**  
+>   **Applying the Information**
+>
+> 1. **Opposite:** The ladder reaches 4 meters up the wall, so the opposite side is 4 meters.
 > 2. **Adjacent:** The base of the ladder is 3 meters from the wall, so the adjacent side is 3 meters.
-> 
-> **Calculating the Angle**  
-> * tan(angle) = 4 / 3  
-> * angle = arctan(4/3)
-> 
+>
+> **Calculating the Angle**
+>
+> - tan(angle) = 4 / 3
+> - angle = arctan(4/3)
+>
 > **Using a Calculator**  
 > You can use a calculator to find the arctangent of 4/3. The result will be the angle in degrees.
-> 
-> **Important Note:**  The angle will be an acute angle (less than 90 degrees).   
-> Let me know if you'd like me to calculate the angle using a specific calculator!  
+>
+> **Important Note:** The angle will be an acute angle (less than 90 degrees).  
+> Let me know if you'd like me to calculate the angle using a specific calculator!
 
 ##### With ICA
-> ```bash  
-> ❯ ./ditana-assistant -a "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meters from the wall. What is the angle between the ladder and the ground?"  
->                              is English: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."  
->            does not refer to a computer: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."  
->                        contextual query: "What is the angle between the ladder and the ground, given the ladder's height is 4 meters and it..."  
-> Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."  
->              answer to contextual query: "Here's how to solve this problem using trigonometry:  **Understanding the Problem**  * We have a ..."  
-> ```  
->   
-> Here's how to solve this problem:  
->    
-> **Understanding the Problem**  
->   
-> * We have a right triangle formed by the ladder, the ground, and the wall.  
-> * The ladder is the hypotenuse (the longest side).  
-> * The distance from the wall to the base of the ladder is one leg.  
-> * The height the ladder reaches on the wall is the other leg.  
->   
-> **Using Trigonometry**  
->   
-> We can use the sine function to find the angle:  
->   
-> * **sin(angle) = opposite side / hypotenuse**  
->   
-> In our case:  
->   
-> * Opposite side = height of the ladder = 4 meters  
-> * Hypotenuse = length of the ladder = unknown  
-> * We need to find the angle (angle)  
->   
-> **Solving for the Angle**  
->   
-> 1. **Substitute the values:** sin(angle) = 4 meters / hypotenuse   
-> 2. **Use the Pythagorean theorem:**  hypotenuse² = base² + height²  
->    *  hypotenuse² = 3 meters² + 4 meters²  
->    *  hypotenuse² = 25 meters²  
->    *  hypotenuse = √25 meters² = 5 meters  
-> 3. **Substitute the hypotenuse back into the sine equation:** sin(angle) = 4 meters / 5 meters  
-> 4. **Solve for the angle:** angle = arcsin(4/5)   
-> 5. **Calculate the angle:** angle ≈ 53.13 degrees  
->   
-> **Answer:** The angle between the ladder and the ground is approximately 53.13 degrees.   
->   
+
+> ```bash
+> ❯ ./ditana-assistant -a "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meters from the wall. What is the angle between the ladder and the ground?"
+>                              is English: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."
+>            does not refer to a computer: "A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meter..."
+>                        contextual query: "What is the angle between the ladder and the ground, given the ladder's height is 4 meters and it..."
+> Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."
+>              answer to contextual query: "Here's how to solve this problem using trigonometry:  **Understanding the Problem**  * We have a ..."
+> ```
+>
+> Here's how to solve this problem:
+>
+> **Understanding the Problem**
+>
+> - We have a right triangle formed by the ladder, the ground, and the wall.
+> - The ladder is the hypotenuse (the longest side).
+> - The distance from the wall to the base of the ladder is one leg.
+> - The height the ladder reaches on the wall is the other leg.
+>
+> **Using Trigonometry**
+>
+> We can use the sine function to find the angle:
+>
+> - **sin(angle) = opposite side / hypotenuse**
+>
+> In our case:
+>
+> - Opposite side = height of the ladder = 4 meters
+> - Hypotenuse = length of the ladder = unknown
+> - We need to find the angle (angle)
+>
+> **Solving for the Angle**
+>
+> 1. **Substitute the values:** sin(angle) = 4 meters / hypotenuse
+> 2. **Use the Pythagorean theorem:** hypotenuse² = base² + height²
+>    - hypotenuse² = 3 meters² + 4 meters²
+>    - hypotenuse² = 25 meters²
+>    - hypotenuse = √25 meters² = 5 meters
+> 3. **Substitute the hypotenuse back into the sine equation:** sin(angle) = 4 meters / 5 meters
+> 4. **Solve for the angle:** angle = arcsin(4/5)
+> 5. **Calculate the angle:** angle ≈ 53.13 degrees
+>
+> **Answer:** The angle between the ladder and the ground is approximately 53.13 degrees.
+>
 > Let me know if you have any other geometry problems!
 
 #### ICA example 3 (using gpt-3.5-turbo with automatic contextual queries)
@@ -792,53 +812,55 @@ A [detailed analysis of ChatGPT-o1](https://chatgpt.com/share/66f52038-c510-8009
 See [public link to the detailed comparison](https://chatgpt.com/share/66f52038-c510-8009-b5ed-be61814b63be) for the full picture.
 
 ##### Without ICA (default)
-> ```bash  
-> ❯ ./ditana-assistant "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockchain technology?"  
->                     is English: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
->   does not refer to a computer: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
-> not suitable for Wolfram|Alpha: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
-> ```  
-> Certainly! In blockchain technology, both proof-of-stake (PoS) and proof-of-work (PoW) are consensus mechanisms used to validate transactions and secure the network.   
->   
-> Proof-of-work requires miners to solve complex mathematical puzzles in order to validate transactions and create new blocks. This process is energy-intensive and requires significant computational power. Miners compete to solve these puzzles, and the first one to do so is rewarded with newly minted cryptocurrency.  
->   
-> On the other hand, proof-of-stake does not require miners to solve complex puzzles. Instead, validators are chosen to create new blocks based on the amount of cryptocurrency they hold and are willing to "stake" as collateral. Validators are selected to create new blocks based on various factors, such as the amount of cryptocurrency they hold and how long they have been staking it.  
->   
-> One key difference between PoS and PoW is the energy consumption. PoW requires a significant amount of energy to solve the puzzles, leading to concerns about its environmental impact. PoS, on the other hand, is considered to be more energy-efficient since it does not require the same level of computational power.  
->   
-> Additionally, PoS is often seen as more secure and resistant to certain types of attacks, such as the 51% attack, where a single entity controls the majority of the network's mining power. In PoS, an attacker would need to control the majority of the cryptocurrency supply to carry out a similar attack.  
->   
-> Overall, both PoW and PoS have their own advantages and disadvantages, and the choice between the two consensus mechanisms often depends on the specific goals and requirements of the blockchain network.  
+
+> ```bash
+> ❯ ./ditana-assistant "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockchain technology?"
+>                     is English: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+>   does not refer to a computer: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+> not suitable for Wolfram|Alpha: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+> ```
+>
+> Certainly! In blockchain technology, both proof-of-stake (PoS) and proof-of-work (PoW) are consensus mechanisms used to validate transactions and secure the network.
+>
+> Proof-of-work requires miners to solve complex mathematical puzzles in order to validate transactions and create new blocks. This process is energy-intensive and requires significant computational power. Miners compete to solve these puzzles, and the first one to do so is rewarded with newly minted cryptocurrency.
+>
+> On the other hand, proof-of-stake does not require miners to solve complex puzzles. Instead, validators are chosen to create new blocks based on the amount of cryptocurrency they hold and are willing to "stake" as collateral. Validators are selected to create new blocks based on various factors, such as the amount of cryptocurrency they hold and how long they have been staking it.
+>
+> One key difference between PoS and PoW is the energy consumption. PoW requires a significant amount of energy to solve the puzzles, leading to concerns about its environmental impact. PoS, on the other hand, is considered to be more energy-efficient since it does not require the same level of computational power.
+>
+> Additionally, PoS is often seen as more secure and resistant to certain types of attacks, such as the 51% attack, where a single entity controls the majority of the network's mining power. In PoS, an attacker would need to control the majority of the cryptocurrency supply to carry out a similar attack.
+>
+> Overall, both PoW and PoS have their own advantages and disadvantages, and the choice between the two consensus mechanisms often depends on the specific goals and requirements of the blockchain network.
 
 ##### With ICA
-> ```bash  
-> ❯ ./ditana-assistant -a "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockchain technology?"  
->                              is English: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
->            does not refer to a computer: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
->          not suitable for Wolfram|Alpha: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."  
->                        contextual query: "How does the energy consumption of the proof-of-stake consensus mechanism compare to that of proo..."  
-> Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."  
->              answer to contextual query: "The energy consumption of the proof-of-stake consensus mechanism is significantly lower compared ..."  
-> ```  
-> Certainly! Here are the key differences between the proof-of-stake (PoS) and proof-of-work (PoW) consensus mechanisms in blockchain technology:  
->   
-> 1. **Validation Process**:  
->    - In PoW, miners compete to solve complex mathematical puzzles in order to validate transactions and create new blocks on the blockchain. The first miner to solve the puzzle gets to add the new block to the blockchain.  
->    - In PoS, validators are chosen to create new blocks based on the amount of cryptocurrency they hold and are willing to "stake" as collateral. Validators are selected based on various factors such as the amount of cryptocurrency they hold and how long they have been staking.  
->  
-> 2. **Energy Consumption**:  
->    - PoW requires a significant amount of computational power and electricity to solve the mathematical puzzles, leading to high energy consumption. This has raised concerns about the environmental impact of PoW blockchains.  
->    - PoS is much more energy-efficient as it does not rely on mining and the energy-intensive process of solving puzzles. Validators are chosen based on their stake in the network, reducing the overall energy consumption of the blockchain.  
->   
-> 3. **Security**:  
->    - PoW is considered to be secure due to the computational power required to solve the puzzles. The idea is that an attacker would need to control a majority of the network's computational power to manipulate the blockchain.  
->    - PoS is also considered secure, as validators have a financial stake in the network. If they validate fraudulent transactions, they risk losing their stake, providing an economic incentive to act honestly.  
->  
-> 4. **Centralization**:  
->    - PoW has been criticized for centralization tendencies, as mining pools with significant computational power can dominate the network.    
->   - PoS is often seen as more decentralized, as validators are chosen based on their stake in the network rather than computational power.  
->   
-> Overall, PoS is seen as a more energy-efficient and environmentally friendly alternative to PoW, while still maintaining security and decentralization in blockchain networks.  
+
+> ```bash
+> ❯ ./ditana-assistant -a "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockchain technology?"
+>                              is English: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+>            does not refer to a computer: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+>          not suitable for Wolfram|Alpha: "Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockcha..."
+>                        contextual query: "How does the energy consumption of the proof-of-stake consensus mechanism compare to that of proo..."
+> Wolfram|Alpha declined contextual query: "The input cannot be interpreted or no short answer is available."
+>              answer to contextual query: "The energy consumption of the proof-of-stake consensus mechanism is significantly lower compared ..."
+> ```
+>
+> Certainly! Here are the key differences between the proof-of-stake (PoS) and proof-of-work (PoW) consensus mechanisms in blockchain technology:
+>
+> 1. **Validation Process**:
+>    - In PoW, miners compete to solve complex mathematical puzzles in order to validate transactions and create new blocks on the blockchain. The first miner to solve the puzzle gets to add the new block to the blockchain.
+>    - In PoS, validators are chosen to create new blocks based on the amount of cryptocurrency they hold and are willing to "stake" as collateral. Validators are selected based on various factors such as the amount of cryptocurrency they hold and how long they have been staking.
+> 2. **Energy Consumption**:
+>    - PoW requires a significant amount of computational power and electricity to solve the mathematical puzzles, leading to high energy consumption. This has raised concerns about the environmental impact of PoW blockchains.
+>    - PoS is much more energy-efficient as it does not rely on mining and the energy-intensive process of solving puzzles. Validators are chosen based on their stake in the network, reducing the overall energy consumption of the blockchain.
+> 3. **Security**:
+>    - PoW is considered to be secure due to the computational power required to solve the puzzles. The idea is that an attacker would need to control a majority of the network's computational power to manipulate the blockchain.
+>    - PoS is also considered secure, as validators have a financial stake in the network. If they validate fraudulent transactions, they risk losing their stake, providing an economic incentive to act honestly.
+> 4. **Centralization**:
+>    - PoW has been criticized for centralization tendencies, as mining pools with significant computational power can dominate the network.
+>
+> - PoS is often seen as more decentralized, as validators are chosen based on their stake in the network rather than computational power.
+>
+> Overall, PoS is seen as a more energy-efficient and environmentally friendly alternative to PoW, while still maintaining security and decentralization in blockchain networks.
 
 ## Collaboration
 
@@ -852,6 +874,7 @@ If you find this project valuable and would like to support its ongoing developm
 At the [top right of this page](https://github.com/acrion/ditana-assistant), GitHub automatically displays links to various funding platforms, which also provide more background information about me.
 
 Your sponsorship helps me to:
+
 - Dedicate more time to developing new features
 - Maintain and improve existing functionality
 - Provide better documentation and support
@@ -883,16 +906,16 @@ Ditana Assistant is currently in active development. Here’s an overview of its
 - **Unit Testing**: The number of unit tests in `input_analyzers_ai_test.py` is currently insufficient. We particularly need more tests for:
   - Cases where the assistant incorrectly identifies (or fails to identify) prompts suitable for terminal command generation.
   - Scenarios in which terminal commands are mistakenly suggested for normal prompts.
-  We encourage users to submit pull requests with additional test cases, especially for edge cases they encounter.
+    We encourage users to submit pull requests with additional test cases, especially for edge cases they encounter.
 
 - **Wolfram|Alpha Integration**: While basic integration is implemented for mathematical calculations and obvious real-time queries (e.g., weather information), this feature can be significantly expanded.
   Wolfram|Alpha offers extensive factual knowledge across various domains, which could enhance the assistant's contextual understanding. Currently, there are no unit tests for this feature.
 
 - **Introspective Contextual Augmentation (ICA)**: This feature is thoroughly developed and rigorously tested.
-Its effectiveness has been validated through comprehensive, standardized tests for statistical significance,
-as detailed in the [Statistical Evaluation and Optimization](#statistical-evaluation-and-optimization) section.
-While proven effective, there are numerous ideas for further enhancements, outlined in the [Experimentation and Further Development](#experimentation-and-further-development) section.
-For a complete overview, see the [Introspective Contextual Augmentation](#introspective-contextual-augmentation-ica) section.
+  Its effectiveness has been validated through comprehensive, standardized tests for statistical significance,
+  as detailed in the [Statistical Evaluation and Optimization](#statistical-evaluation-and-optimization) section.
+  While proven effective, there are numerous ideas for further enhancements, outlined in the [Experimentation and Further Development](#experimentation-and-further-development) section.
+  For a complete overview, see the [Introspective Contextual Augmentation](#introspective-contextual-augmentation-ica) section.
 
 We are actively working on improving cross-platform compatibility, expanding features, and enhancing overall reliability. We welcome contributions, especially in the form of testing, feedback, and pull requests for all environments and features.
 
