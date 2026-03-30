@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -29,12 +29,12 @@ It handles the creation, updating, and interaction with the webview-based GUI.
 import json
 import os
 import queue
-
 import typing
+
 import webview  # https://pywebview.flowrl.com/guide/
 
-from ditana_assistant.engine.conversation_manager import ConversationManager
 from ditana_assistant.engine import text_processors_regex
+from ditana_assistant.engine.conversation_manager import ConversationManager
 
 
 class AssistantWindow:
@@ -55,11 +55,13 @@ class AssistantWindow:
         self.ui_update_queue = queue.Queue()
 
         if is_open:
-            self.window = webview.create_window(title='Ditana Assistant',
-                                                url=os.path.join(os.path.dirname(__file__), 'index.html'),
-                                                js_api=conversation,
-                                                width=1280,
-                                                height=1024)
+            self.window = webview.create_window(
+                title="Ditana Assistant",
+                url=os.path.join(os.path.dirname(__file__), "index.html"),
+                js_api=conversation,
+                width=1280,
+                height=1024,
+            )
 
             def on_closed():
                 print("Main window closed, stopping thread...")
@@ -76,7 +78,7 @@ class AssistantWindow:
 
         """
         if self.window is not None:
-            self.ui_update_queue.put(('set_version', version_info))
+            self.ui_update_queue.put(("set_version", version_info))
 
     def set_ui_input(self, user_input: str) -> None:
         """
@@ -86,7 +88,7 @@ class AssistantWindow:
             user_input (str): The user input to be set in the UI.
         """
         if self.window is not None:
-            self.ui_update_queue.put(('input', user_input))
+            self.ui_update_queue.put(("input", user_input))
 
     def set_ui_response(self, response: str) -> None:
         """
@@ -96,14 +98,14 @@ class AssistantWindow:
             response (str): The assistant’s response to be displayed in the UI.
         """
         if self.window is not None:
-            self.ui_update_queue.put(('response', response))
+            self.ui_update_queue.put(("response", response))
 
     def click_send_button(self) -> None:
         """
         Simulate clicking the send button in the UI.
         """
         if self.window is not None:
-            self.ui_update_queue.put(('click_send', None))
+            self.ui_update_queue.put(("click_send", None))
 
     def process_ui_updates(self) -> None:
         """
@@ -111,15 +113,17 @@ class AssistantWindow:
         """
         while not self.ui_update_queue.empty():
             update_type, content = self.ui_update_queue.get()
-            if update_type == 'input':
+            if update_type == "input":
                 escaped_content = json.dumps(content)
-                self.window.evaluate_js(f"document.getElementById('input').value = {escaped_content}")
-            elif update_type == 'response':
+                self.window.evaluate_js(
+                    f"document.getElementById('input').value = {escaped_content}"
+                )
+            elif update_type == "response":
                 content = text_processors_regex.ensure_markdown_horizontal_line(content)
                 escaped_content = json.dumps(content)
                 self.window.evaluate_js(f"appendToResponse({escaped_content})")
-            elif update_type == 'click_send':
+            elif update_type == "click_send":
                 self.window.evaluate_js("document.getElementById('sendButton').click()")
-            elif update_type == 'set_version':
+            elif update_type == "set_version":
                 escaped_content = json.dumps(content)
                 self.window.evaluate_js(f"setVersion({escaped_content})")

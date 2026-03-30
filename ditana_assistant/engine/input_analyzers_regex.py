@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -28,8 +28,8 @@ in a text. All of these functions make use of regular expressions. The parallel
 module `input_analyzers_ai` uses the LLM instead.
 """
 
-from typing import Final, Tuple
 import re
+from typing import Final, Tuple
 
 
 def likely_contains_multiple_sentences(text: str) -> bool:
@@ -54,7 +54,7 @@ def likely_contains_multiple_sentences(text: str) -> bool:
           - It may give false positives for certain abbreviations followed by punctuation.
           - It doesn't account for unconventional writing styles or specific formatting.
     """
-    return bool(re.search(r'[a-z.]{2}[.!?]\s', text.strip()))
+    return bool(re.search(r"[a-z.]{2}[.!?]\s", text.strip()))
 
 
 def is_likely_code(text: str) -> Tuple[bool, float]:
@@ -88,7 +88,7 @@ def is_likely_code(text: str) -> Tuple[bool, float]:
         An empty string input will always return (False, NaN).
     """
     if text == "":
-        return False, float('nan')
+        return False, float("nan")
 
     features = [
         (count_programming_tokens, 13),
@@ -102,11 +102,11 @@ def is_likely_code(text: str) -> Tuple[bool, float]:
     total_score = 0
     total_weight = 0
 
-    bias: Final = 2/3
+    bias: Final = 2 / 3
 
     for feature_func, weight in features:
         score = feature_func(text)
-        total_score += score ** bias * weight
+        total_score += score**bias * weight
         total_weight += weight
 
     confidence = total_score / total_weight
@@ -124,18 +124,18 @@ def count_programming_tokens(text: str) -> float:
         float: A score between 0 and 1 representing the proportion of programming patterns.
     """
     programming_patterns = [
-        r'\b(if|else|return|for|do|while|print|function|def|class|import|from)\b',  # Common keywords
-        r'\.[^\s0-9]',  # A dot followed by a non-whitespace and non-digit character (e.g., method calls, property access)
-        r'-[A-Z]',  # A hyphen followed by an uppercase letter (e.g., PowerShell cmdlets)
-        r'[\[\]]',  # Square brackets
-        r'==|!=|<=|>=|&&|\|\|',  # Common comparison and logical operators
-        r'#.*$',  # Single-line comments
-        r'//.*$',  # Alternative single-line comments
-        r'/\*[\s\S]*?\*/',  # Multi-line comments
+        r"\b(if|else|return|for|do|while|print|function|def|class|import|from)\b",  # Common keywords
+        r"\.[^\s0-9]",  # A dot followed by a non-whitespace and non-digit character (e.g., method calls, property access)
+        r"-[A-Z]",  # A hyphen followed by an uppercase letter (e.g., PowerShell cmdlets)
+        r"[\[\]]",  # Square brackets
+        r"==|!=|<=|>=|&&|\|\|",  # Common comparison and logical operators
+        r"#.*$",  # Single-line comments
+        r"//.*$",  # Alternative single-line comments
+        r"/\*[\s\S]*?\*/",  # Multi-line comments
         r'"\w+":',  # JSON-style key definitions
-        r'(?<=\s)@\w+',  # Decorators or annotations
-        r'\$\w+',  # Variable names in shell scripts or PHP
-        r'(?<!:)//[^/\s]+',  # URLs in code (excluding http:// or https://)
+        r"(?<=\s)@\w+",  # Decorators or annotations
+        r"\$\w+",  # Variable names in shell scripts or PHP
+        r"(?<!:)//[^/\s]+",  # URLs in code (excluding http:// or https://)
     ]
 
     total_matches = 0
@@ -160,7 +160,7 @@ def count_special_characters(text: str) -> float:
     Returns:
         float: A score between 0 and 1 representing the proportion of special characters.
     """
-    special_chars = '|$#[]<>&_{}~/\\'
+    special_chars = "|$#[]<>&_{}~/\\"
     char_count = sum(text.count(char) for char in special_chars)
     return min(char_count / len(text) * 10, 1) if text else 0
 
@@ -175,9 +175,12 @@ def check_indentation(text: str) -> float:
     Returns:
         float: A score between 0 and 1 representing the proportion of indented lines.
     """
-    lines = text.split('\n')
+    lines = text.split("\n")
     indented_lines = sum(
-        1 for line in lines if line.strip() and line[0].isspace() and not line.lstrip().startswith('-'))
+        1
+        for line in lines
+        if line.strip() and line[0].isspace() and not line.lstrip().startswith("-")
+    )
     return indented_lines / len(lines) if lines else 0
 
 
@@ -191,7 +194,7 @@ def check_line_starts(text: str) -> float:
     Returns:
         float: A score between 0 and 1 representing the proportion of lines starting with lowercase letters.
     """
-    lines = text.split('\n')
+    lines = text.split("\n")
     lowercase_starts = sum(1 for line in lines if line.strip() and line[0].islower())
     return lowercase_starts / len(lines) if lines else 0
 
@@ -206,7 +209,7 @@ def check_camel_case(text: str) -> float:
     Returns:
         float: A score between 0 and 1 representing the proportion of camelCase words.
     """
-    camel_case_pattern = r'[a-z]+([A-Z][a-z]+)+'
+    camel_case_pattern = r"[a-z]+([A-Z][a-z]+)+"
     camel_case_words = len(re.findall(camel_case_pattern, text))
     return min(camel_case_words / len(text.split()) if text.split() else 0, 1)
 
@@ -221,5 +224,5 @@ def count_single_letter_variables(text: str) -> float:
     Returns:
         float: A score between 0 and 1 representing the proportion of single-letter variables.
     """
-    single_letters = re.findall(r'\b[a-zA-Z]\b', text)
+    single_letters = re.findall(r"\b[a-zA-Z]\b", text)
     return min(len(single_letters) / len(text.split()) if text.split() else 0, 1)

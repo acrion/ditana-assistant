@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -78,20 +78,25 @@ class TestIsLikelyCode(unittest.TestCase):
                 if model_type == ModelType.OPENAI:
                     Configuration.set(openai_model=openai_model)
 
-                print(f"---- Model type: {model_type}, OpenAI Model: {openai_model or 'N/A'}  ----")
+                print(
+                    f"---- Model type: {model_type}, OpenAI Model: {openai_model or 'N/A'}  ----"
+                )
                 test_func()
 
     def test_is_likely_code(self):
         """Test the is_likely_code function with various test cases."""
+
         def test_func():
             test_cases = get_test_cases()
             for description, input_text, expected_output in test_cases:
                 with self.subTest(description=description):
                     result = input_analyzers_ai.is_likely_code(input_text)[0]
-                    self.assertEqual(result, expected_output, f"Failed test case: {description}")
+                    self.assertEqual(
+                        result, expected_output, f"Failed test case: {description}"
+                    )
 
         self.run_test_for_all_models(test_func)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

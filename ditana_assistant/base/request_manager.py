@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -31,11 +31,11 @@ reliable communication with AI services by implementing error handling and retry
 import hashlib
 import json
 import os
-from pathlib import Path
 import queue
 import re
 import threading
 import time
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import requests
@@ -48,22 +48,22 @@ from ditana_assistant.base.wolfram_alpha_short_answers import WolframAlphaShortA
 
 class RequestManager:
     """
-    RequestManager is a base class responsible for managing API requests to AI models.
+     RequestManager is a base class responsible for managing API requests to AI models.
 
-    It handles sending requests, caching responses to improve performance, and interacting with
-    external services like Wolfram Alpha for additional functionalities. The class provides
-    a standardized method `send_model_request` for sending requests and processing responses,
-    including error handling and retry mechanisms to ensure reliable communication with AI
-    services.
+     It handles sending requests, caching responses to improve performance, and interacting with
+     external services like Wolfram Alpha for additional functionalities. The class provides
+     a standardized method `send_model_request` for sending requests and processing responses,
+     including error handling and retry mechanisms to ensure reliable communication with AI
+     services.
 
-   Attributes:
-        _wolfram_alpha (WolframAlphaShortAnswers): An instance to handle Wolfram Alpha short answers.
-        _force_wolfram_alpha (bool): A flag to force the use of Wolfram Alpha.
-        _pastime_mode (bool): A flag to enable pastime mode.
-        _impersonate (str): A string to specify impersonation.
-        _code_input_event (threading.Event): An event for code input synchronization.
-        _code_input_global (queue.Queue): A global queue for code input.
-        _stop_thread (threading.Event): An event to signal thread termination.
+    Attributes:
+         _wolfram_alpha (WolframAlphaShortAnswers): An instance to handle Wolfram Alpha short answers.
+         _force_wolfram_alpha (bool): A flag to force the use of Wolfram Alpha.
+         _pastime_mode (bool): A flag to enable pastime mode.
+         _impersonate (str): A string to specify impersonation.
+         _code_input_event (threading.Event): An event for code input synchronization.
+         _code_input_global (queue.Queue): A global queue for code input.
+         _stop_thread (threading.Event): An event to signal thread termination.
     """
 
     _request_cache: Optional[StringCache] = None
@@ -227,9 +227,9 @@ class RequestManager:
         # makes significant improvements. A one-week cache is used to reduce the number of API calls.
         cls._request_cache = StringCache(
             base_filename="model_request_cache",
-            default_lifetime=Configuration.get()['MODEL_CACHE_START_LIFETIME_SEC'],
+            default_lifetime=Configuration.get()["MODEL_CACHE_START_LIFETIME_SEC"],
             priority_cache_path=priority_cache_path,
-            max_size=Configuration.get()['MODEL_CACHE_SIZE']*1024*1024
+            max_size=Configuration.get()["MODEL_CACHE_SIZE"] * 1024 * 1024,
         )
 
     @classmethod
@@ -276,7 +276,7 @@ class RequestManager:
                     endpoint
                     + json.dumps(request, sort_keys=True)
                     + str(RequestManager.ica())
-                    + Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID']
+                    + Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"]
                 )
                 hash_sum = hashlib.sha256(hash_input.encode()).hexdigest()
                 assistant_answer = cls._request_cache.get(hash_sum)
@@ -285,54 +285,64 @@ class RequestManager:
 
                 headers = {"Content-Type": "application/json"}
 
-                if Configuration.get()['MODEL_TYPE'] == config.ModelType.OPENAI:
-                    headers["Authorization"] = f"Bearer {os.environ.get('OPENAI_API_KEY')}"
+                if Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI:
+                    headers["Authorization"] = (
+                        f"Bearer {os.environ.get('OPENAI_API_KEY')}"
+                    )
 
-                response = session.post(
-                    endpoint,
-                    headers=headers,
-                    json=request
-                )
+                response = session.post(endpoint, headers=headers, json=request)
 
                 response_json = response.json()
 
-                if response_json.get('detail', {}).get('type') == 'service_unavailable':
+                if response_json.get("detail", {}).get("type") == "service_unavailable":
                     print(f"{endpoint} is busy, retrying in 3 seconds...")
                     time.sleep(3)
-                elif 'error' in response_json:
-                    error = response_json['error']
+                elif "error" in response_json:
+                    error = response_json["error"]
                     if isinstance(error, dict):
-                        error_message = error.get('message', 'Unknown error occurred')
-                        error_type = error.get('type', 'unknown_error')
-                        error_code = error.get('code', 'unknown_code')
+                        error_message = error.get("message", "Unknown error occurred")
+                        error_type = error.get("type", "unknown_error")
+                        error_code = error.get("code", "unknown_code")
 
-                        if error_code == 'rate_limit_exceeded':
+                        if error_code == "rate_limit_exceeded":
                             # Try to extract the wait time from the error message
-                            wait_time_match = re.search(r'try again in (\d+\.?\d*)s', error_message)
+                            wait_time_match = re.search(
+                                r"try again in (\d+\.?\d*)s", error_message
+                            )
                             if wait_time_match:
                                 wait_time = float(wait_time_match.group(1))
-                                print(f"Rate limit exceeded. Waiting for {wait_time} seconds before retrying.")
+                                print(
+                                    f"Rate limit exceeded. Waiting for {wait_time} seconds before retrying."
+                                )
                                 time.sleep(wait_time)
                                 continue
                             else:
                                 print(error_message)
-                                print(f"Rate limit exceeded. Retrying in {retry_delay} seconds.")
+                                print(
+                                    f"Rate limit exceeded. Retrying in {retry_delay} seconds."
+                                )
                                 time.sleep(retry_delay)
-                                retry_delay *= 2  # Double the retry delay for the next iteration
+                                retry_delay *= (
+                                    2  # Double the retry delay for the next iteration
+                                )
                                 continue
 
-                        assistant_answer = f"API Error: {error_type} - {error_code}\n{error_message}"
+                        assistant_answer = (
+                            f"API Error: {error_type} - {error_code}\n{error_message}"
+                        )
                     else:
                         assistant_answer = f"API Error: {error}"
                     break
                 else:
-                    assistant_answer = model_interface.extract_assistant_answer(response_json)
+                    assistant_answer = model_interface.extract_assistant_answer(
+                        response_json
+                    )
                     cls._request_cache.set(hash_sum, assistant_answer)
                     break
         except requests.exceptions.RequestException as e:
             assistant_answer = str(e)
 
-        if Configuration.get()['SHOW_DEBUG_MESSAGES']:
+        if Configuration.get()["SHOW_DEBUG_MESSAGES"]:
             print("----------------------------------------------------------------")
             print("Response:")
             print("----------------------------------------------------------------")

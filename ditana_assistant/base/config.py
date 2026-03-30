@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -28,12 +28,11 @@ It defines default configuration values, loads user configuration from a YAML fi
 and provides access to configuration settings such as model type and debug options.
 """
 
-from typing import Final, TypedDict, cast
-from pathlib import Path
 import enum
 import os
-
 import threading
+from pathlib import Path
+from typing import Final, TypedDict, cast
 
 import platformdirs
 import yaml
@@ -41,6 +40,7 @@ import yaml
 
 class ModelType(enum.Enum):
     """Enumeration of supported AI model types."""
+
     GEMMA = "gemma"
     OPENAI = "openai"
 
@@ -50,9 +50,11 @@ class ConfigDict(TypedDict):
     Represents the configuration of Ditana Assistant, except command line parameters.
     It is synced with CONFIG_FILE.
     """
+
     MODEL_TYPE: ModelType
     SHOW_DEBUG_MESSAGES: bool
     OPENAI_MODEL: str
+    OPENAI_BASE_URL: str
     KOBOLDCPP_BASE_URL: str
     WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID: str
     GENERATE_TERMINAL_CMD: bool
@@ -71,6 +73,7 @@ class Configuration:
     """
     Singleton class for managing the application configuration.
     """
+
     _instance = None
     _lock = threading.Lock()
 
@@ -97,32 +100,39 @@ class Configuration:
         """
         try:
             if os.path.exists(CONFIG_FILE):
-                with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                     config_dict = yaml.safe_load(f)
 
                 # Create a mapping between DEFAULT_CONFIG keys and config_dict keys
                 default_to_file_key_map = {
-                    'MODEL_TYPE': 'model_type',
-                    'SHOW_DEBUG_MESSAGES': 'show_debug_messages',
-                    'OPENAI_MODEL': 'openai_model',
-                    'KOBOLDCPP_BASE_URL': 'koboldcpp_base_url',
-                    'WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID': 'wolfram_alpha_short_answers_app_id',
-                    'GENERATE_TERMINAL_CMD': 'generate_terminal_cmd',
-                    'OFFER_CMD_EXECUTION': 'offer_cmd_execution',
-                    'ASSUME_ENGLISH': "assume_english",
-                    'MODEL_CACHE_SIZE': "model_cache_size",
-                    'MODEL_CACHE_START_LIFETIME_SEC': "model_cache_start_lifetime_sec",
-                    'WOLFRAM_ALPHA_CACHE_SIZE': "wolfram_alpha_cache_size",
-                    'WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC': "wolfram_alpha_cache_start_lifetime_sec",
-                    'WOLFRAM_ALPHA_ERROR_CACHE_SIZE': "wolfram_alpha_error_cache_size",
-                    'WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC': "wolfram_alpha_error_cache_start_lifetime_sec",
-                    'ENABLE_EXPERIMENTAL_FEATURES': "enable_experimental_features"
+                    "MODEL_TYPE": "model_type",
+                    "SHOW_DEBUG_MESSAGES": "show_debug_messages",
+                    "OPENAI_MODEL": "openai_model",
+                    "OPENAI_BASE_URL": "openai_base_url",
+                    "KOBOLDCPP_BASE_URL": "koboldcpp_base_url",
+                    "WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID": "wolfram_alpha_short_answers_app_id",
+                    "GENERATE_TERMINAL_CMD": "generate_terminal_cmd",
+                    "OFFER_CMD_EXECUTION": "offer_cmd_execution",
+                    "ASSUME_ENGLISH": "assume_english",
+                    "MODEL_CACHE_SIZE": "model_cache_size",
+                    "MODEL_CACHE_START_LIFETIME_SEC": "model_cache_start_lifetime_sec",
+                    "WOLFRAM_ALPHA_CACHE_SIZE": "wolfram_alpha_cache_size",
+                    "WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC": "wolfram_alpha_cache_start_lifetime_sec",
+                    "WOLFRAM_ALPHA_ERROR_CACHE_SIZE": "wolfram_alpha_error_cache_size",
+                    "WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC": "wolfram_alpha_error_cache_start_lifetime_sec",
+                    "ENABLE_EXPERIMENTAL_FEATURES": "enable_experimental_features",
                 }
 
                 # Check for unexpected entries
-                unexpected_keys = set(config_dict.keys()) - set(default_to_file_key_map.values())
+                unexpected_keys = set(config_dict.keys()) - set(
+                    default_to_file_key_map.values()
+                )
                 if unexpected_keys:
-                    raise ValueError(f"Unexpected entries in config file: {', '.join(unexpected_keys)}")
+                    print(
+                        f"Warning: Ignoring unknown entries in config file: {', '.join(unexpected_keys)}"
+                    )
+                    for key in unexpected_keys:
+                        del config_dict[key]
 
                 # Create a new config dictionary
                 new_config: ConfigDict = cast(ConfigDict, {})
@@ -135,10 +145,12 @@ class Configuration:
                     else:
                         new_config[default_key] = DEFAULT_CONFIG[default_key]
                         changes_made = True
-                        print(f"Added missing config entry: {file_key} = {DEFAULT_CONFIG[default_key]}")
+                        print(
+                            f"Added missing config entry: {file_key} = {DEFAULT_CONFIG[default_key]}"
+                        )
 
                 # Convert ModelType from string to enum
-                new_config['MODEL_TYPE'] = ModelType(new_config['MODEL_TYPE'])
+                new_config["MODEL_TYPE"] = ModelType(new_config["MODEL_TYPE"])
 
                 self.__config = new_config
 
@@ -150,9 +162,6 @@ class Configuration:
                 self.__config = DEFAULT_CONFIG.copy()
                 self._save()
                 print("Created new config file with default values.")
-        except ValueError as e:
-            print(f"Error in configuration file: {e}")
-            raise
         except (yaml.YAMLError, KeyError) as e:
             print(f"Error loading configuration from {CONFIG_FILE}: {e}")
             raise
@@ -162,23 +171,36 @@ class Configuration:
         Save the current configuration to file.
         """
         os.makedirs(CONFIG_DIR, exist_ok=True)
-        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             config_to_save = {
-                "model_type": self.__config['MODEL_TYPE'].value,
-                "show_debug_messages": self.__config['SHOW_DEBUG_MESSAGES'],
-                "openai_model": self.__config['OPENAI_MODEL'],
-                "koboldcpp_base_url": self.__config['KOBOLDCPP_BASE_URL'],
-                "wolfram_alpha_short_answers_app_id": self.__config['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'],
-                "generate_terminal_cmd": self.__config['GENERATE_TERMINAL_CMD'],
-                "offer_cmd_execution": self.__config['OFFER_CMD_EXECUTION'],
-                "assume_english": self.__config['ASSUME_ENGLISH'],
-                "model_cache_size": self.__config['MODEL_CACHE_SIZE'],
-                "model_cache_start_lifetime_sec": self.__config['MODEL_CACHE_START_LIFETIME_SEC'],
-                "wolfram_alpha_cache_size": self.__config['WOLFRAM_ALPHA_CACHE_SIZE'],
-                "wolfram_alpha_cache_start_lifetime_sec": self.__config['WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC'],
-                "wolfram_alpha_error_cache_size": self.__config['WOLFRAM_ALPHA_ERROR_CACHE_SIZE'],
-                "wolfram_alpha_error_cache_start_lifetime_sec": self.__config['WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC'],
-                "enable_experimental_features": self.__config['ENABLE_EXPERIMENTAL_FEATURES']
+                "model_type": self.__config["MODEL_TYPE"].value,
+                "show_debug_messages": self.__config["SHOW_DEBUG_MESSAGES"],
+                "openai_model": self.__config["OPENAI_MODEL"],
+                "openai_base_url": self.__config["OPENAI_BASE_URL"],
+                "koboldcpp_base_url": self.__config["KOBOLDCPP_BASE_URL"],
+                "wolfram_alpha_short_answers_app_id": self.__config[
+                    "WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"
+                ],
+                "generate_terminal_cmd": self.__config["GENERATE_TERMINAL_CMD"],
+                "offer_cmd_execution": self.__config["OFFER_CMD_EXECUTION"],
+                "assume_english": self.__config["ASSUME_ENGLISH"],
+                "model_cache_size": self.__config["MODEL_CACHE_SIZE"],
+                "model_cache_start_lifetime_sec": self.__config[
+                    "MODEL_CACHE_START_LIFETIME_SEC"
+                ],
+                "wolfram_alpha_cache_size": self.__config["WOLFRAM_ALPHA_CACHE_SIZE"],
+                "wolfram_alpha_cache_start_lifetime_sec": self.__config[
+                    "WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC"
+                ],
+                "wolfram_alpha_error_cache_size": self.__config[
+                    "WOLFRAM_ALPHA_ERROR_CACHE_SIZE"
+                ],
+                "wolfram_alpha_error_cache_start_lifetime_sec": self.__config[
+                    "WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC"
+                ],
+                "enable_experimental_features": self.__config[
+                    "ENABLE_EXPERIMENTAL_FEATURES"
+                ],
             }
             yaml.dump(config_to_save, f)
 
@@ -195,22 +217,25 @@ class Configuration:
                     self._load()
         return self.__config
 
-    def set_config(self,
-                   model_type: ModelType,
-                   show_debug_messages: bool,
-                   openai_model: str,
-                   koboldcpp_base_url: str,
-                   wolfram_alpha_short_answers_app_id: str,
-                   generate_terminal_cmd: bool,
-                   offer_cmd_execution: bool,
-                   assume_english: bool,
-                   model_cache_size: int,
-                   model_cache_start_lifetime_sec: float,
-                   wolfram_alpha_cache_size: int,
-                   wolfram_alpha_cache_start_lifetime_sec: float,
-                   wolfram_alpha_error_cache_size: int,
-                   wolfram_alpha_error_cache_start_lifetime_sec: float,
-                   enable_experimental_features: bool):
+    def set_config(
+        self,
+        model_type: ModelType,
+        show_debug_messages: bool,
+        openai_model: str,
+        openai_base_url: str,
+        koboldcpp_base_url: str,
+        wolfram_alpha_short_answers_app_id: str,
+        generate_terminal_cmd: bool,
+        offer_cmd_execution: bool,
+        assume_english: bool,
+        model_cache_size: int,
+        model_cache_start_lifetime_sec: float,
+        wolfram_alpha_cache_size: int,
+        wolfram_alpha_cache_start_lifetime_sec: float,
+        wolfram_alpha_error_cache_size: int,
+        wolfram_alpha_error_cache_start_lifetime_sec: float,
+        enable_experimental_features: bool,
+    ):
         """
         Set a new configuration.
 
@@ -218,6 +243,7 @@ class Configuration:
             model_type (ModelType): The model type to use.
             show_debug_messages (bool): Whether to show debug messages.
             openai_model (str): In case model_type == ModelType.OPENAI, the OpenAI model to use.
+            openai_base_url (str): The base URL for the OpenAI-compatible API, e.g. "https://api.openai.com"
             koboldcpp_base_url (str): In case model_type != ModelType.OPENAI, the base URL of the KoboldCpp server, e.g. "http://localhost:5001"
             wolfram_alpha_short_answers_app_id: WolframAlpha App ID for "Short Answers API", see https://developer.wolframalpha.com
             generate_terminal_cmd (bool): If True, analyzes user input to determine if it can be resolved using a terminal command
@@ -248,12 +274,13 @@ class Configuration:
                                                     This flag enables the use of new or experimental functionalities without specifying
                                                     which particular features are activated. It is intended for internal use to
                                                     systematically test changes and should be used with caution.
-         """
+        """
         with self._lock:
             self.__config = ConfigDict(
                 MODEL_TYPE=model_type,
                 SHOW_DEBUG_MESSAGES=show_debug_messages,
                 OPENAI_MODEL=openai_model,
+                OPENAI_BASE_URL=openai_base_url,
                 KOBOLDCPP_BASE_URL=koboldcpp_base_url,
                 WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID=wolfram_alpha_short_answers_app_id,
                 GENERATE_TERMINAL_CMD=generate_terminal_cmd,
@@ -265,7 +292,7 @@ class Configuration:
                 WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC=wolfram_alpha_cache_start_lifetime_sec,
                 WOLFRAM_ALPHA_ERROR_CACHE_SIZE=wolfram_alpha_error_cache_size,
                 WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC=wolfram_alpha_error_cache_start_lifetime_sec,
-                ENABLE_EXPERIMENTAL_FEATURES=enable_experimental_features
+                ENABLE_EXPERIMENTAL_FEATURES=enable_experimental_features,
             )
 
     def reset_config(self):
@@ -286,22 +313,26 @@ class Configuration:
         return cls.get_instance().get_config()
 
     @classmethod
-    def set(cls, *,
-            model_type: ModelType | None = None,
-            show_debug_messages: bool | None = None,
-            openai_model: str | None = None,
-            koboldcpp_base_url: str | None = None,
-            wolfram_alpha_short_answers_app_id: str | None = None,
-            generate_terminal_cmd: bool | None = None,
-            offer_cmd_execution: bool | None = None,
-            assume_english: bool | None = None,
-            model_cache_size: int | None = None,
-            model_cache_start_lifetime_sec: float | None = None,
-            wolfram_alpha_cache_size: int | None = None,
-            wolfram_alpha_cache_start_lifetime_sec: float | None = None,
-            wolfram_alpha_error_cache_size: int | None = None,
-            wolfram_alpha_error_cache_start_lifetime_sec: float | None = None,
-            enable_experimental_features: bool | None = None):
+    def set(
+        cls,
+        *,
+        model_type: ModelType | None = None,
+        show_debug_messages: bool | None = None,
+        openai_model: str | None = None,
+        openai_base_url: str | None = None,
+        koboldcpp_base_url: str | None = None,
+        wolfram_alpha_short_answers_app_id: str | None = None,
+        generate_terminal_cmd: bool | None = None,
+        offer_cmd_execution: bool | None = None,
+        assume_english: bool | None = None,
+        model_cache_size: int | None = None,
+        model_cache_start_lifetime_sec: float | None = None,
+        wolfram_alpha_cache_size: int | None = None,
+        wolfram_alpha_cache_start_lifetime_sec: float | None = None,
+        wolfram_alpha_error_cache_size: int | None = None,
+        wolfram_alpha_error_cache_start_lifetime_sec: float | None = None,
+        enable_experimental_features: bool | None = None,
+    ):
         """
         Update the configuration with new values. Parameters not provided will retain their current values.
 
@@ -309,6 +340,7 @@ class Configuration:
             model_type (ModelType): The model type to use.
             show_debug_messages (bool): Whether to show debug messages.
             openai_model (str): In case model_type == ModelType.OPENAI, the OpenAI model to use.
+            openai_base_url (str): The base URL for the OpenAI-compatible API, e.g. "https://api.openai.com"
             koboldcpp_base_url (str): In case model_type != ModelType.OPENAI, the base URL of the KoboldCpp server, e.g. "http://localhost:5001"
             wolfram_alpha_short_answers_app_id: WolframAlpha App ID for "Short Answers API", see https://developer.wolframalpha.com
             generate_terminal_cmd (bool): If True, analyzes user input to determine if it can be resolved using a terminal command
@@ -343,21 +375,54 @@ class Configuration:
         current_config = cls.get()
 
         new_config = {
-            'model_type': model_type if model_type is not None else current_config['MODEL_TYPE'],
-            'show_debug_messages': show_debug_messages if show_debug_messages is not None else current_config['SHOW_DEBUG_MESSAGES'],
-            'openai_model': openai_model if openai_model is not None else current_config['OPENAI_MODEL'],
-            'koboldcpp_base_url': koboldcpp_base_url if koboldcpp_base_url is not None else current_config['KOBOLDCPP_BASE_URL'],
-            'wolfram_alpha_short_answers_app_id': wolfram_alpha_short_answers_app_id if wolfram_alpha_short_answers_app_id is not None else current_config['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'],
-            'generate_terminal_cmd': generate_terminal_cmd if generate_terminal_cmd is not None else current_config['GENERATE_TERMINAL_CMD'],
-            'offer_cmd_execution': offer_cmd_execution if offer_cmd_execution is not None else current_config['OFFER_CMD_EXECUTION'],
-            'assume_english': assume_english if assume_english is not None else current_config['ASSUME_ENGLISH'],
-            'model_cache_size': model_cache_size if model_cache_size is not None else current_config['MODEL_CACHE_SIZE'],
-            'model_cache_start_lifetime_sec': model_cache_start_lifetime_sec if model_cache_start_lifetime_sec is not None else current_config['MODEL_CACHE_START_LIFETIME_SEC'],
-            'wolfram_alpha_cache_size': wolfram_alpha_cache_size if wolfram_alpha_error_cache_size is not None else current_config['WOLFRAM_ALPHA_CACHE_SIZE'],
-            'wolfram_alpha_cache_start_lifetime_sec': wolfram_alpha_cache_start_lifetime_sec if wolfram_alpha_cache_start_lifetime_sec is not None else current_config['WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC'],
-            'wolfram_alpha_error_cache_size': wolfram_alpha_error_cache_size if wolfram_alpha_error_cache_size is not None else current_config['WOLFRAM_ALPHA_ERROR_CACHE_SIZE'],
-            'wolfram_alpha_error_cache_start_lifetime_sec': wolfram_alpha_error_cache_start_lifetime_sec if wolfram_alpha_error_cache_start_lifetime_sec is not None else current_config['WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC'],
-            'enable_experimental_features': enable_experimental_features if enable_experimental_features is not None else current_config['ENABLE_EXPERIMENTAL_FEATURES']
+            "model_type": model_type
+            if model_type is not None
+            else current_config["MODEL_TYPE"],
+            "show_debug_messages": show_debug_messages
+            if show_debug_messages is not None
+            else current_config["SHOW_DEBUG_MESSAGES"],
+            "openai_model": openai_model
+            if openai_model is not None
+            else current_config["OPENAI_MODEL"],
+            "openai_base_url": openai_base_url
+            if openai_base_url is not None
+            else current_config["OPENAI_BASE_URL"],
+            "koboldcpp_base_url": koboldcpp_base_url
+            if koboldcpp_base_url is not None
+            else current_config["KOBOLDCPP_BASE_URL"],
+            "wolfram_alpha_short_answers_app_id": wolfram_alpha_short_answers_app_id
+            if wolfram_alpha_short_answers_app_id is not None
+            else current_config["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"],
+            "generate_terminal_cmd": generate_terminal_cmd
+            if generate_terminal_cmd is not None
+            else current_config["GENERATE_TERMINAL_CMD"],
+            "offer_cmd_execution": offer_cmd_execution
+            if offer_cmd_execution is not None
+            else current_config["OFFER_CMD_EXECUTION"],
+            "assume_english": assume_english
+            if assume_english is not None
+            else current_config["ASSUME_ENGLISH"],
+            "model_cache_size": model_cache_size
+            if model_cache_size is not None
+            else current_config["MODEL_CACHE_SIZE"],
+            "model_cache_start_lifetime_sec": model_cache_start_lifetime_sec
+            if model_cache_start_lifetime_sec is not None
+            else current_config["MODEL_CACHE_START_LIFETIME_SEC"],
+            "wolfram_alpha_cache_size": wolfram_alpha_cache_size
+            if wolfram_alpha_error_cache_size is not None
+            else current_config["WOLFRAM_ALPHA_CACHE_SIZE"],
+            "wolfram_alpha_cache_start_lifetime_sec": wolfram_alpha_cache_start_lifetime_sec
+            if wolfram_alpha_cache_start_lifetime_sec is not None
+            else current_config["WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC"],
+            "wolfram_alpha_error_cache_size": wolfram_alpha_error_cache_size
+            if wolfram_alpha_error_cache_size is not None
+            else current_config["WOLFRAM_ALPHA_ERROR_CACHE_SIZE"],
+            "wolfram_alpha_error_cache_start_lifetime_sec": wolfram_alpha_error_cache_start_lifetime_sec
+            if wolfram_alpha_error_cache_start_lifetime_sec is not None
+            else current_config["WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC"],
+            "enable_experimental_features": enable_experimental_features
+            if enable_experimental_features is not None
+            else current_config["ENABLE_EXPERIMENTAL_FEATURES"],
         }
 
         cls.get_instance().set_config(**new_config)
@@ -374,21 +439,22 @@ class Configuration:
 # According to https://platform.openai.com/docs/models/gpt-3-5-turbo: "As of July 2024, gpt-4o-mini should be used in place of gpt-3.5-turbo, as it is cheaper, more capable, multimodal, and just as fast. gpt-3.5-turbo is still available for use in the API."
 
 DEFAULT_CONFIG: Final[ConfigDict] = {
-    "MODEL_TYPE": ModelType.GEMMA,
+    "MODEL_TYPE": ModelType.OPENAI,
     "SHOW_DEBUG_MESSAGES": False,
-    "OPENAI_MODEL": "gpt-4o-mini",
+    "OPENAI_MODEL": "phi4-mini",
+    "OPENAI_BASE_URL": "http://localhost:11434",  # ollama
     "KOBOLDCPP_BASE_URL": "http://localhost:5001",
     "WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID": "",
     "GENERATE_TERMINAL_CMD": True,
     "OFFER_CMD_EXECUTION": True,
     "ASSUME_ENGLISH": False,
     "MODEL_CACHE_SIZE": 20,
-    "MODEL_CACHE_START_LIFETIME_SEC": 7*24*3600,
+    "MODEL_CACHE_START_LIFETIME_SEC": 7 * 24 * 3600,
     "WOLFRAM_ALPHA_CACHE_SIZE": 1,
-    "WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC": 3600*3//16,
+    "WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC": 3600 * 3 // 16,
     "WOLFRAM_ALPHA_ERROR_CACHE_SIZE": 1,
-    "WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC": 7*24*3600,
-    "ENABLE_EXPERIMENTAL_FEATURES": False
+    "WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC": 7 * 24 * 3600,
+    "ENABLE_EXPERIMENTAL_FEATURES": False,
 }
 
 
@@ -412,6 +478,8 @@ DEFAULT_CONFIG: Final[ConfigDict] = {
 # Setting appauthor to "." effectively removes the additional directory level on Windows,
 # as "." is treated as the current directory. This aligns the behavior with common practices
 # in modern Windows applications while maintaining the expected behavior on Unix-like systems.
-CONFIG_DIR: Final = Path(platformdirs.user_config_dir(appname="ditana-assistant", appauthor="."))
+CONFIG_DIR: Final = Path(
+    platformdirs.user_config_dir(appname="ditana-assistant", appauthor=".")
+)
 
 CONFIG_FILE: Final = Path(os.path.join(CONFIG_DIR, "config.yaml"))

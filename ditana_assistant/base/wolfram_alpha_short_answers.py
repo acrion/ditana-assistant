@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -85,11 +85,21 @@ class WolframAlphaShortAnswers:
 
     # Wolfram|Alpha answers may contain real-time data. This cache duration
     # represents a balance between freshness and minimizing API requests.
-    _answer_cache = StringCache(base_filename="wolfram_alpha_answer_cache", default_lifetime=Configuration.get()['WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC'], max_size=Configuration.get()['WOLFRAM_ALPHA_CACHE_SIZE']*1024*1024)
+    _answer_cache = StringCache(
+        base_filename="wolfram_alpha_answer_cache",
+        default_lifetime=Configuration.get()["WOLFRAM_ALPHA_CACHE_START_LIFETIME_SEC"],
+        max_size=Configuration.get()["WOLFRAM_ALPHA_CACHE_SIZE"] * 1024 * 1024,
+    )
 
     # When Wolfram|Alpha declines a request, it is likely to continue rejecting the same
     #  request. A one-week cache helps avoid redundant API calls for failed requests.
-    _error_cache = StringCache(base_filename="wolfram_alpha_error_cache", default_lifetime=Configuration.get()['WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC'], max_size=Configuration.get()['WOLFRAM_ALPHA_ERROR_CACHE_SIZE']*1024*1024)
+    _error_cache = StringCache(
+        base_filename="wolfram_alpha_error_cache",
+        default_lifetime=Configuration.get()[
+            "WOLFRAM_ALPHA_ERROR_CACHE_START_LIFETIME_SEC"
+        ],
+        max_size=Configuration.get()["WOLFRAM_ALPHA_ERROR_CACHE_SIZE"] * 1024 * 1024,
+    )
 
     @staticmethod
     def query(question: str) -> Tuple[Optional[str], Optional[str]]:
@@ -106,10 +116,13 @@ class WolframAlphaShortAnswers:
             Tuple[Optional[str], Optional[str]]: A tuple containing the API response
             and an error message (if any). If successful, the error will be None.
         """
-        app_id = Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID']
+        app_id = Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"]
 
         if not app_id or app_id == "":
-            return None, 'API application ID is not set. You may generate one for the "Short Answers API" under https://developer.wolframalpha.com).'
+            return (
+                None,
+                'API application ID is not set. You may generate one for the "Short Answers API" under https://developer.wolframalpha.com).',
+            )
 
         if question in WolframAlphaShortAnswers._answer_cache:
             return WolframAlphaShortAnswers._answer_cache.get(question), None
@@ -128,7 +141,9 @@ class WolframAlphaShortAnswers:
             return result, None
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 501:
-                error_text = "The input cannot be interpreted or no short answer is available."
+                error_text = (
+                    "The input cannot be interpreted or no short answer is available."
+                )
                 WolframAlphaShortAnswers._error_cache.set(question, error_text)
             elif e.response.status_code == 400:
                 error_text = "Invalid API request. Check the input parameter."

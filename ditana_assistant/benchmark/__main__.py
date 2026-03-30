@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -51,11 +51,14 @@ complex reasoning tasks.
 import argparse
 import sys
 
-from ditana_assistant.benchmark import statistics
 from ditana_assistant.base.config import Configuration, ModelType
 from ditana_assistant.base.request_manager import RequestManager
+from ditana_assistant.benchmark import statistics
+from ditana_assistant.benchmark.multiple_choice_dataset import (
+    DatasetIdentifier,
+    MultipleChoiceDataset,
+)
 from ditana_assistant.engine.conversation_manager import ConversationManager
-from ditana_assistant.benchmark.multiple_choice_dataset import MultipleChoiceDataset, DatasetIdentifier
 
 
 def run_evaluation(dataset_identifier: DatasetIdentifier, benchmark_experimental: bool):
@@ -65,7 +68,7 @@ def run_evaluation(dataset_identifier: DatasetIdentifier, benchmark_experimental
     for i, sample in enumerate(dataset.iterate_questions()):
         question = sample["question"]
         labeled_choices = sample["choices"]  # List of tuples (label, choice)
-        correct_answer = sample["answer"]     # Correct answer label, e.g., 'B', 'C', etc.
+        correct_answer = sample["answer"]  # Correct answer label, e.g., 'B', 'C', etc.
 
         print(f"\n--- Question {i + 1} ---")
         print(f"Question: {question}")
@@ -84,11 +87,15 @@ def run_evaluation(dataset_identifier: DatasetIdentifier, benchmark_experimental
 
         test_feature_name = "experimental" if benchmark_experimental else "ICA"
 
-        print(f"Model’s answer (without {test_feature_name} feature): {prediction_without_feature if prediction_without_feature else 'None'}")
+        print(
+            f"Model’s answer (without {test_feature_name} feature): {prediction_without_feature if prediction_without_feature else 'None'}"
+        )
 
         prediction_with_feature = dataset.process_question(question, labeled_choices)
 
-        print(f"Model’s answer (with {test_feature_name} feature): {prediction_with_feature if prediction_with_feature else 'None'}")
+        print(
+            f"Model’s answer (with {test_feature_name} feature): {prediction_with_feature if prediction_with_feature else 'None'}"
+        )
 
         correct_no_ica = prediction_without_feature == correct_answer
         correct_ica = prediction_with_feature == correct_answer
@@ -107,23 +114,30 @@ def main():
         wolfram_alpha_short_answers_app_id="",
         generate_terminal_cmd=False,
         offer_cmd_execution=False,
-        assume_english=True
+        assume_english=True,
     )
 
     parser = argparse.ArgumentParser(description="Benchmark of Ditana Assistant")
     parser.add_argument(
-        "-c", "--priority-cache",
+        "-c",
+        "--priority-cache",
         type=str,
         help="Use a priority cache file for read-only access to predefined responses. "
-             "This allows the assistant to respond using cached data from the specified priority cache file before accessing the normal request cache."
+        "This allows the assistant to respond using cached data from the specified priority cache file before accessing the normal request cache.",
     )
     parser.add_argument("-r", "--run", action="store_true", help="Run the benchmark.")
-    parser.add_argument("-e", "--experimental", action="store_true", help="Compare ICA with an experimental version of it.")
     parser.add_argument(
-        "-d", "--dataset",
+        "-e",
+        "--experimental",
+        action="store_true",
+        help="Compare ICA with an experimental version of it.",
+    )
+    parser.add_argument(
+        "-d",
+        "--dataset",
         type=str,
         required=True,
-        help="Identifier of the dataset to use. For example, 'ai2_arc' or 'cais_mmlu_logical_fallacies_test'."
+        help="Identifier of the dataset to use. For example, 'ai2_arc' or 'cais_mmlu_logical_fallacies_test'.",
     )
     args = parser.parse_args()
 

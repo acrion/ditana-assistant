@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -29,10 +29,10 @@ The main function, get_process_info(), determines the operating system and calls
 appropriate OS-specific function to gather process information.
 """
 
-import subprocess
 import os
-import re
 import platform
+import re
+import subprocess
 
 
 def get_process_info_linux():
@@ -49,8 +49,16 @@ def get_process_info_linux():
     """
     try:
         result = []
-        hostname = subprocess.check_output("hostname", stderr=subprocess.DEVNULL).decode().strip()
-        wmctrl_output = subprocess.check_output(["wmctrl", "-l", "-p"], stderr=subprocess.DEVNULL).decode().splitlines()
+        hostname = (
+            subprocess.check_output("hostname", stderr=subprocess.DEVNULL)
+            .decode()
+            .strip()
+        )
+        wmctrl_output = (
+            subprocess.check_output(["wmctrl", "-l", "-p"], stderr=subprocess.DEVNULL)
+            .decode()
+            .splitlines()
+        )
 
         for line in wmctrl_output:
             _, _, pid, *title_parts = line.split(None, 3)
@@ -60,7 +68,7 @@ def get_process_info_linux():
             cmdline = get_cmdline(pid)
 
             # Remove hostname from title
-            title = re.sub(f'^{re.escape(hostname)} ', '', title)
+            title = re.sub(f"^{re.escape(hostname)} ", "", title)
 
             # Check if process name is in title (case-insensitive)
             if process_name.lower() not in title.lower():
@@ -89,9 +97,9 @@ def get_process_info_windows():
         str: A string containing information about each window/process, with one entry per line.
              Each line includes the command line and window title.
     """
+    import psutil
     import win32gui
     import win32process
-    import psutil
 
     def callback(hwnd, windows):
         """
@@ -153,7 +161,7 @@ def get_process_name(pid):
         str: The name of the process, or an empty string if the information cannot be retrieved.
     """
     try:
-        with open(f'/proc/{pid}/comm', 'r', encoding='utf-8') as f:
+        with open(f"/proc/{pid}/comm", "r", encoding="utf-8") as f:
             return f.read().strip()
     except:
         return ""
@@ -170,8 +178,8 @@ def get_cmdline(pid):
         str: The command line of the process, or an empty string if the information cannot be retrieved.
     """
     try:
-        with open(f'/proc/{pid}/cmdline', 'r', encoding='utf-8') as f:
-            return f.read().replace('\x00', ' ').split()[0]
+        with open(f"/proc/{pid}/cmdline", "r", encoding="utf-8") as f:
+            return f.read().replace("\x00", " ").split()[0]
     except:
         return ""
 
@@ -193,7 +201,7 @@ def remove_path_components(text, path):
     components = path.lower().split(os.sep)
     for component in components:
         if component:
-            text = re.sub(rf'\b{re.escape(component)}\b', '', text, flags=re.IGNORECASE)
+            text = re.sub(rf"\b{re.escape(component)}\b", "", text, flags=re.IGNORECASE)
     return text
 
 

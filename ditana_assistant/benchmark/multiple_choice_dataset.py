@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -28,9 +28,11 @@ This module provides functionality to handle multiple choice datasets, including
 """
 
 import re
-from datasets import load_dataset, get_dataset_config_names
-from typing import List, Dict, Any, Optional, Iterator, Tuple
 from enum import Enum
+from typing import Any, Dict, Iterator, List, Optional, Tuple
+
+from datasets import get_dataset_config_names, load_dataset
+
 from ditana_assistant.engine.conversation_manager import ConversationManager
 
 
@@ -38,6 +40,7 @@ class DatasetIdentifier(Enum):
     """
     Enumeration of supported dataset identifiers.
     """
+
     AI2_ARC = "ai2_arc"
     CAIS_MMLU = "cais_mmlu"
     # Add more identifiers here as needed
@@ -47,6 +50,7 @@ class MultipleChoiceDataset:
     """
     A class to handle multiple choice datasets such as AI2 ARC and CAIS MMLU.
     """
+
     def __init__(self, identifier: DatasetIdentifier):
         """
         Initializes the MultipleChoiceDataset with the specified dataset identifier.
@@ -69,7 +73,7 @@ class MultipleChoiceDataset:
         """
         datasets = []
         if self.identifier == DatasetIdentifier.AI2_ARC:
-            split = 'test'
+            split = "test"
             print(f"Loading dataset 'ai2_arc' with split '{split}'...")
             try:
                 dataset = load_dataset("ai2_arc", "ARC-Challenge", split=split)
@@ -78,20 +82,28 @@ class MultipleChoiceDataset:
             except ValueError as ve:
                 print(f"Error loading 'ai2_arc' with split '{split}': {ve}")
         elif self.identifier == DatasetIdentifier.CAIS_MMLU:
-            split='test'
+            split = "test"
             config = "all"
-            print(f"Loading dataset 'cais/mmlu' with configuration '{config}' and split '{split}'...")
+            print(
+                f"Loading dataset 'cais/mmlu' with configuration '{config}' and split '{split}'..."
+            )
             try:
                 ds = load_dataset("cais/mmlu", config, split=split)
                 datasets.append((config, ds))
-                print(f"Loaded 'cais/mmlu' with configuration '{config}' and {len(ds)} samples.")
+                print(
+                    f"Loaded 'cais/mmlu' with configuration '{config}' and {len(ds)} samples."
+                )
             except ValueError as ve:
-                print(f"Error loading 'cais/mmlu' with configuration '{config}' and split '{split}': {ve}")
+                print(
+                    f"Error loading 'cais/mmlu' with configuration '{config}' and split '{split}': {ve}"
+                )
         else:
             raise ValueError(f"Unknown dataset identifier: {self.identifier}")
 
         if not datasets:
-            print(f"No datasets loaded for identifier '{self.identifier}' with split '{split}'.")
+            print(
+                f"No datasets loaded for identifier '{self.identifier}' with split '{split}'."
+            )
         return datasets
 
     def __len__(self) -> int:
@@ -146,7 +158,7 @@ class MultipleChoiceDataset:
                 yield {
                     "question": question,
                     "choices": labeled_choices,  # List of tuples (label, choice)
-                    "answer": correct_answer      # Correct answer label, e.g., 'B', 'C', etc.
+                    "answer": correct_answer,  # Correct answer label, e.g., 'B', 'C', etc.
                 }
         elif self.identifier == DatasetIdentifier.CAIS_MMLU:
             for config_name, ds in self.datasets:
@@ -156,12 +168,14 @@ class MultipleChoiceDataset:
                     choices = sample.get("choices", [])
                     labeled_choices = self._label_choices(choices)
                     answer_index = sample.get("answer", None)
-                    correct_answer = self._map_cais_mmlu_answer(answer_index, len(choices))
+                    correct_answer = self._map_cais_mmlu_answer(
+                        answer_index, len(choices)
+                    )
 
                     yield {
                         "question": question,
                         "choices": labeled_choices,  # List of tuples (label, choice)
-                        "answer": correct_answer      # Correct answer label, e.g., 'B', 'C', etc.
+                        "answer": correct_answer,  # Correct answer label, e.g., 'B', 'C', etc.
                     }
         else:
             raise ValueError(f"Unsupported dataset identifier: {self.identifier}")
@@ -203,21 +217,27 @@ class MultipleChoiceDataset:
         if answer_key.isdigit():
             index = int(answer_key)  # 1-based index
             mapped_label = chr(65 + index)  # 'A' + index
-        elif re.match(r'^[A-Z]$', answer_key.upper()):
+        elif re.match(r"^[A-Z]$", answer_key.upper()):
             original_label = answer_key.upper()
             index = ord(original_label) - 65  # 'A' -> 0, 'B' -> 1, etc.
-            mapped_label = chr(66 + index)    # 'B' + index
+            mapped_label = chr(66 + index)  # 'B' + index
         else:
             return None
 
-        if 66 <= ord(mapped_label) <= 90 and (0 <= (ord(mapped_label) - 66) < num_choices):
+        if 66 <= ord(mapped_label) <= 90 and (
+            0 <= (ord(mapped_label) - 66) < num_choices
+        ):
             return mapped_label
         else:
-            print("Internal error in _map_ai2_arc_answer: Could not interpret correct answer in dataset!")
+            print(
+                "Internal error in _map_ai2_arc_answer: Could not interpret correct answer in dataset!"
+            )
             return None
 
     @staticmethod
-    def _map_cais_mmlu_answer(answer_index: Optional[int], num_choices: int) -> Optional[str]:
+    def _map_cais_mmlu_answer(
+        answer_index: Optional[int], num_choices: int
+    ) -> Optional[str]:
         """
         Maps the original answer index to the new label starting at 'B'.
         For example:
@@ -234,7 +254,9 @@ class MultipleChoiceDataset:
         if isinstance(answer_index, int) and 0 <= answer_index < num_choices:
             return chr(66 + answer_index)  # 'B' + index
         else:
-            print("Internal error in _map_cais_mmlu_answer: Could not interpret correct answer in dataset!")
+            print(
+                "Internal error in _map_cais_mmlu_answer: Could not interpret correct answer in dataset!"
+            )
             return None
 
     @staticmethod
@@ -250,7 +272,7 @@ class MultipleChoiceDataset:
             Optional[str]: The first allowed letter found, or None if none are found.
         """
         allowed_letters = set(chr(66 + i) for i in range(n))  # B, C, D, etc.
-        pattern = r'\b[B-Z]\b'
+        pattern = r"\b[B-Z]\b"
 
         matches = re.finditer(pattern, text.upper())
 
@@ -261,7 +283,9 @@ class MultipleChoiceDataset:
 
         return None
 
-    def process_question(self, question: str, choices: List[Tuple[str, str]]) -> Optional[str]:
+    def process_question(
+        self, question: str, choices: List[Tuple[str, str]]
+    ) -> Optional[str]:
         """
         Processes the question and choices, sends them to the ConversationManager,
         and returns the validated prediction.
@@ -278,7 +302,9 @@ class MultipleChoiceDataset:
             prompt += f"{label}. {choice}\n"
         prompt += "\nPlease provide the letter of the correct answer."
 
-        prediction = ConversationManager().process_input(query=prompt, meta_call=False)[0]
+        prediction = ConversationManager().process_input(query=prompt, meta_call=False)[
+            0
+        ]
         valid_prediction = self.find_first_allowed_letter(prediction, len(choices))
 
         return valid_prediction

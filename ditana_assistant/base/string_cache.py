@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -32,8 +32,8 @@ that do not change are gradually given longer lifetimes.
 import json
 import os
 import tempfile
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import platformdirs
@@ -50,11 +50,12 @@ class StringCache:
     """
 
     def __init__(
-            self,
-            base_filename: str,
-            default_lifetime: float,
-            max_size: int = 50*1024*1024,
-            priority_cache_path: Optional[Path] = None):
+        self,
+        base_filename: str,
+        default_lifetime: float,
+        max_size: int = 50 * 1024 * 1024,
+        priority_cache_path: Optional[Path] = None,
+    ):
         """
         Initialize the StringCache.
 
@@ -69,8 +70,13 @@ class StringCache:
         self.default_lifetime = default_lifetime
         self.max_size = max_size
         self.cache: Dict[str, Tuple[str, float, float]] = {}
-        self.file_path: Path = Path(platformdirs.user_data_dir("ditana-assistant", ".")) / f"{base_filename}.json"
-        self.priority_cache_path: Optional[Path] = None if priority_cache_path is None else Path(priority_cache_path)
+        self.file_path: Path = (
+            Path(platformdirs.user_data_dir("ditana-assistant", "."))
+            / f"{base_filename}.json"
+        )
+        self.priority_cache_path: Optional[Path] = (
+            None if priority_cache_path is None else Path(priority_cache_path)
+        )
         self.priority_cache: Optional[Dict[str, Tuple[str, float, float]]] = None
         self._load_cache()
         self.current_size = self._get_current_size()
@@ -78,11 +84,11 @@ class StringCache:
     def _load_cache(self) -> None:
         """Load the cache from the JSON file if it exists."""
         if self.file_path.exists():
-            with self.file_path.open('r', encoding='utf-8') as f:
+            with self.file_path.open("r", encoding="utf-8") as f:
                 self.cache = json.load(f)
 
         if self.priority_cache_path is not None:
-            with self.priority_cache_path.open('r', encoding='utf-8') as f:
+            with self.priority_cache_path.open("r", encoding="utf-8") as f:
                 self.priority_cache = json.load(f)
 
     def _save_cache(self) -> None:
@@ -90,12 +96,12 @@ class StringCache:
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Create a temporary file in the same directory as the target file
-        temp_fd, temp_path = tempfile.mkstemp(dir=self.file_path.parent,
-                                              prefix=self.base_filename,
-                                              suffix='.tmp')
+        temp_fd, temp_path = tempfile.mkstemp(
+            dir=self.file_path.parent, prefix=self.base_filename, suffix=".tmp"
+        )
 
         try:
-            with os.fdopen(temp_fd, 'w', encoding='utf-8') as temp_file:
+            with os.fdopen(temp_fd, "w", encoding="utf-8") as temp_file:
                 json.dump(self.cache, temp_file)
 
             # Perform an atomic rename
@@ -108,7 +114,7 @@ class StringCache:
     @staticmethod
     def _get_entry_size(key: str, value: str) -> int:
         """Calculate the size of a cache entry in bytes."""
-        return len(key.encode('utf-8')) + len(value.encode('utf-8'))
+        return len(key.encode("utf-8")) + len(value.encode("utf-8"))
 
     def _get_current_size(self) -> int:
         """Calculate the current size of the cache in bytes."""
@@ -173,7 +179,9 @@ class StringCache:
                 return False
 
             # Remove the most exceeded entry
-            removed_size = self._get_entry_size(most_exceeded_entry, self.cache[most_exceeded_entry][0])
+            removed_size = self._get_entry_size(
+                most_exceeded_entry, self.cache[most_exceeded_entry][0]
+            )
             del self.cache[most_exceeded_entry]
             new_size -= removed_size
 
@@ -229,7 +237,7 @@ class StringCache:
                              or None if the key does not exist
         """
         if self.priority_cache and key in self.priority_cache:
-            return float('inf')
+            return float("inf")
         if key in self.cache:
             _, timestamp, lifetime = self.cache[key]
             return lifetime - (time.time() - timestamp)

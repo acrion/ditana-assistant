@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -29,14 +29,13 @@ It handles command-line arguments, initializes the necessary components,
 and starts the main conversation loop.
 """
 
+import argparse
+import os
+import platform
 import sys
 import threading
 import time
-
-import argparse
-from importlib.metadata import version, PackageNotFoundError
-import os
-import platform
+from importlib.metadata import PackageNotFoundError, version
 
 import platformdirs
 import webview  # https://pywebview.flowrl.com/guide/
@@ -44,12 +43,8 @@ import webview  # https://pywebview.flowrl.com/guide/
 from ditana_assistant.base import config
 from ditana_assistant.base.config import Configuration
 from ditana_assistant.base.output_manager import OutputManager
-
-from ditana_assistant.engine import pastime
-from ditana_assistant.engine import context
+from ditana_assistant.engine import context, pastime, terminal_interaction
 from ditana_assistant.engine.conversation_manager import ConversationManager
-from ditana_assistant.engine import terminal_interaction
-
 from ditana_assistant.gui.assistant_window import AssistantWindow
 
 
@@ -57,7 +52,9 @@ def main():
     """
     The main function that sets up and runs the Ditana Assistant.
     """
-    if Configuration.get()['MODEL_TYPE'] == config.ModelType.OPENAI and not os.environ.get('OPENAI_API_KEY'):
+    if Configuration.get()[
+        "MODEL_TYPE"
+    ] == config.ModelType.OPENAI and not os.environ.get("OPENAI_API_KEY"):
         print("""
 Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.
 
@@ -70,20 +67,54 @@ To get an API key:
         sys.exit(1)
 
     parser = argparse.ArgumentParser(description="Ditana Assistant")
-    parser.add_argument("-v", "--version", action="store_true", help="Show the version of Ditana Assistant and exit.")
-    parser.add_argument("-u", "--gui", action="store_true", help="Display a graphical dialog.")
-    parser.add_argument("-a", "--augmentation", action="store_true", help="Enable Introspective Contextual Augmentation (ICA) for enhanced AI responses.")
-    parser.add_argument("-w", "--wolfram-alpha", action="store_true", help="Force use of Wolfram|Alpha for first prompt.")
-    parser.add_argument("-q", "--quiet", action="store_true", help="Run in quiet mode. No progress output, no continuation of dialog (except confirmation of command execution).")
-    parser.add_argument("-p", "--pastime", action="store_true", help="Pastime mode with a human-like dialog partner.")
-    parser.add_argument("-i", "--impersonate", type=str, help="In Pastime mode, optionally impersonate the person you specify (implies -p).")
-    parser.add_argument("task", nargs=argparse.REMAINDER, help="The task for the assistant.")
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="store_true",
+        help="Show the version of Ditana Assistant and exit.",
+    )
+    parser.add_argument(
+        "-u", "--gui", action="store_true", help="Display a graphical dialog."
+    )
+    parser.add_argument(
+        "-a",
+        "--augmentation",
+        action="store_true",
+        help="Enable Introspective Contextual Augmentation (ICA) for enhanced AI responses.",
+    )
+    parser.add_argument(
+        "-w",
+        "--wolfram-alpha",
+        action="store_true",
+        help="Force use of Wolfram|Alpha for first prompt.",
+    )
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Run in quiet mode. No progress output, no continuation of dialog (except confirmation of command execution).",
+    )
+    parser.add_argument(
+        "-p",
+        "--pastime",
+        action="store_true",
+        help="Pastime mode with a human-like dialog partner.",
+    )
+    parser.add_argument(
+        "-i",
+        "--impersonate",
+        type=str,
+        help="In Pastime mode, optionally impersonate the person you specify (implies -p).",
+    )
+    parser.add_argument(
+        "task", nargs=argparse.REMAINDER, help="The task for the assistant."
+    )
 
     args = parser.parse_args()
 
     version_info = ""
     try:
-        version_info = version('ditana-assistant')
+        version_info = version("ditana-assistant")
     except PackageNotFoundError:
         version_info = "unknown"
 
@@ -92,9 +123,11 @@ To get an API key:
         sys.exit(0)
 
     if args.gui and args.quiet:
-        print("Error: The options '-u/--gui' and '-q/--quiet' cannot be used together. "
-              "In GUI mode, user input is always expected. The quiet mode is intended for terminal-based usage only.",
-              file=sys.stderr)
+        print(
+            "Error: The options '-u/--gui' and '-q/--quiet' cannot be used together. "
+            "In GUI mode, user input is always expected. The quiet mode is intended for terminal-based usage only.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     OutputManager.hide_messages = args.quiet
@@ -112,9 +145,9 @@ To get an API key:
         ConversationManager.set_pastime_mode(True)
         ConversationManager.set_impersonate(args.impersonate)
         if args.impersonate:
-            print(f'(impersonating {args.impersonate})')
+            print(f"(impersonating {args.impersonate})")
         else:
-            print('(impersonating Ditana)')
+            print("(impersonating Ditana)")
         print()
 
     user_input = " ".join(args.task).strip() if args.task else ""
@@ -133,7 +166,10 @@ To get an API key:
         if user_input == "":
             print(pastime.initial_line())
 
-    terminal_thread_instance = threading.Thread(target=terminal_interaction.terminal_thread, args=(conversation, window, user_input, args.quiet))
+    terminal_thread_instance = threading.Thread(
+        target=terminal_interaction.terminal_thread,
+        args=(conversation, window, user_input, args.quiet),
+    )
     terminal_thread_instance.start()
 
     if args.gui:
@@ -162,16 +198,18 @@ To get an API key:
         # While primarily needed for Windows and Linux, setting these for all platforms
         # in the same way, including macOS, allows for consistent behavior across platforms
         # and simplifies cross-platform development.
-        os.environ['WEBKIT_DISABLE_DMABUF_RENDERER'] = '1'  # relevant for Linux
-        os.environ['WEBKIT_DISABLE_COMPOSITING_MODE'] = '1'  # relevant for Windows
+        os.environ["WEBKIT_DISABLE_DMABUF_RENDERER"] = "1"  # relevant for Linux
+        os.environ["WEBKIT_DISABLE_COMPOSITING_MODE"] = "1"  # relevant for Windows
 
         # Force 'edgechromium' on Windows for Ditana Assistant compatibility.
         # pywebview defaults to 'mshtml' on Windows if 'edgechromium' is unavailable
         # This ensures a more meaningful error (hopefully related to missing Edge Runtime)
         # instead of ambiguous JavaScript errors from 'mshtml'.
-        webview.start(storage_path=platformdirs.user_data_dir(),
-                      debug=Configuration.get()['SHOW_DEBUG_MESSAGES'],
-                      gui='edgechromium' if platform.system() == "Windows" else None)
+        webview.start(
+            storage_path=platformdirs.user_data_dir(),
+            debug=Configuration.get()["SHOW_DEBUG_MESSAGES"],
+            gui="edgechromium" if platform.system() == "Windows" else None,
+        )
 
         ui_update_thread.join()
 

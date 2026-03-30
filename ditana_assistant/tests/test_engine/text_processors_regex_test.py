@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -34,10 +34,16 @@ class TestRegex(unittest.TestCase):
     """
     Test various input analyzer functions.
     """
+
     def test_remove_works_and_phrases(self) -> None:
         """
         Simple case of remove_words_and_phrases. Just replace two words with one.
         """
-        text = 'Ich bin Sherlock Holmes, der berühmte Detektiv. Und ich weiß noch viel mehr über Sie, als Sie sich vorstellen können. Bitte erzählen Sie mir mehr über Ihre Reise aus Baskerville.'
-        result = text_processors_regex.remove_words_and_phrases(text, "Sherlock Holmes", "Ditana")
-        self.assertEqual("Ich bin Ditana, der berühmte Detektiv. Und ich weiß noch viel mehr über Sie, als Sie sich vorstellen können. Bitte erzählen Sie mir mehr über Ihre Reise aus Baskerville.", result)
+        text = "Ich bin Sherlock Holmes, der berühmte Detektiv. Und ich weiß noch viel mehr über Sie, als Sie sich vorstellen können. Bitte erzählen Sie mir mehr über Ihre Reise aus Baskerville."
+        result = text_processors_regex.remove_words_and_phrases(
+            text, "Sherlock Holmes", "Ditana"
+        )
+        self.assertEqual(
+            "Ich bin Ditana, der berühmte Detektiv. Und ich weiß noch viel mehr über Sie, als Sie sich vorstellen können. Bitte erzählen Sie mir mehr über Ihre Reise aus Baskerville.",
+            result,
+        )

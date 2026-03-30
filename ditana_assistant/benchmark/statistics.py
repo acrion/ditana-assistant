@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -50,8 +50,7 @@ def calculate_significance(results):
         elif c1 and c2:
             n11 += 1
 
-    table = [[n00, n01],
-             [n10, n11]]
+    table = [[n00, n01], [n10, n11]]
 
     if (n01 + n10) == 0:
         return None

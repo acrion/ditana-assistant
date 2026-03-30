@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -48,27 +48,27 @@ def get_test_cases() -> List[TestCase]:
         (
             "Test if a single letter variable assignment is identified as code",
             "x = 5",
-            True
+            True,
         ),
         (
             "Test if multiple single letter variables in a loop are identified as code",
             "for i in range(n): a += b * c",
-            True
+            True,
         ),
         (
             "Test if normal text is correctly identified as non-code",
             "Dies ist ein normaler Satz ohne Code.",
-            False
+            False,
         ),
         (
             "Test if a PowerShell command is correctly identified as code",
             "Get-Content D:\\TestAusgabe.txt",
-            True
+            True,
         ),
         (
             "Test if a command without backticks is correctly identified as code",
             "systemctl status systemd-resolved",
-            True
+            True,
         ),
         (
             "Test if normal text that contains monospace formatted text is correctly identified as non-code",
@@ -79,24 +79,24 @@ testtest
 ``` 
 
 Let me know if you'd like to explore other file operations!""",
-            False
+            False,
         ),
         (
             "Test if a short bash command is correctly identified as code",
             "cat ~/test.txt",
-            True
+            True,
         ),
         (
             "Test if meta execution of assistant is correctly identified as code",
             """```bash
 ditana-assistant "Was kannst du mir über mein System erzählen?" $(uname -a)
 ```""",
-            True
+            True,
         ),
         (
             "Test if the output of a mathematical calculation is identified as non-code",
             "Der Wert von \\( 3^{50} \\) ist 7.625.597.484.987.",
-            False
+            False,
         ),
         (
             "Test if commented maths is correctly identified as not code",
@@ -108,7 +108,7 @@ cos(θ) = 3 / 4
 θ = arccos(3/4)
 θ ≈ 36.87 degrees
 Therefore, the angle between the ladder and the ground is approximately 36.87 degrees.""",
-            False
+            False,
         ),
         (
             "Test if powershell code is correctly identified as code",
@@ -116,6 +116,6 @@ Therefore, the angle between the ladder and the ground is approximately 36.87 de
 $file = "~/test.txt"
 (Get-Content $file)
 ```""",
-            True
+            True,
         ),
     ]

@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -25,18 +25,20 @@
 This module manages the conversation flow in the Ditana Assistant.
 It handles user inputs, processes them through the AI model, and manages the conversation context.
 """
-from typing import Final, Optional, List, Dict, Literal, Tuple
+
+from typing import Dict, Final, List, Literal, Optional, Tuple
 
 from ditana_assistant.base import model_interface
 from ditana_assistant.base.config import Configuration
-from ditana_assistant.base.output_manager import truncate_string, OutputManager
+from ditana_assistant.base.output_manager import OutputManager, truncate_string
 from ditana_assistant.base.request_manager import RequestManager
-
-from ditana_assistant.engine import context
-from ditana_assistant.engine import input_analyzers_ai
-from ditana_assistant.engine import pastime
-from ditana_assistant.engine import text_processors_ai
-from ditana_assistant.engine import text_processors_regex
+from ditana_assistant.engine import (
+    context,
+    input_analyzers_ai,
+    pastime,
+    text_processors_ai,
+    text_processors_regex,
+)
 
 
 class ConversationManager(RequestManager):
@@ -121,19 +123,37 @@ class ConversationManager(RequestManager):
             factual_query = ""
             wolfram_alpha_answer = None
 
-            if (Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'] is not None
-                    and Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'] != ""):
-                factual_query = text_processors_ai.generate_factual_query(request, self.messages)
-                wolfram_alpha_answer, wolfram_alpha_error = ConversationManager.wolfram_alpha().query(factual_query)
+            if (
+                Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"] is not None
+                and Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"] != ""
+            ):
+                factual_query = text_processors_ai.generate_factual_query(
+                    request, self.messages
+                )
+                wolfram_alpha_answer, wolfram_alpha_error = (
+                    ConversationManager.wolfram_alpha().query(factual_query)
+                )
                 if wolfram_alpha_answer:
-                    OutputManager.print_formatted("Wolfram|Alpha’s answer to factual query", wolfram_alpha_answer)
+                    OutputManager.print_formatted(
+                        "Wolfram|Alpha’s answer to factual query", wolfram_alpha_answer
+                    )
                 else:
-                    OutputManager.print_formatted("Wolfram|Alpha declined factual query", wolfram_alpha_error)
+                    OutputManager.print_formatted(
+                        "Wolfram|Alpha declined factual query", wolfram_alpha_error
+                    )
 
-            systematic_query_including_request, systematic_query = text_processors_ai.generate_systematic_query(request, self.messages)
-            OutputManager.print_formatted("systematic contextual query", systematic_query)
-            answer_to_systematic_query, _ = ConversationManager(self.messages).process_input(systematic_query_including_request)
-            OutputManager.print_formatted("answer to systematic query", answer_to_systematic_query)
+            systematic_query_including_request, systematic_query = (
+                text_processors_ai.generate_systematic_query(request, self.messages)
+            )
+            OutputManager.print_formatted(
+                "systematic contextual query", systematic_query
+            )
+            answer_to_systematic_query, _ = ConversationManager(
+                self.messages
+            ).process_input(systematic_query_including_request)
+            OutputManager.print_formatted(
+                "answer to systematic query", answer_to_systematic_query
+            )
 
             if wolfram_alpha_answer:
                 self.append_user_message(factual_query)
@@ -145,7 +165,14 @@ class ConversationManager(RequestManager):
     #            fact_list = text_processors_ai.extract_fact_list(request, answer_to_systematic_query)
     #            self.append_user_message(fact_list)
 
-    def generate_assistant_response(self, generate_terminal_command: bool, use_wolfram_alpha: bool, query: str, english_query: str, meta_call: bool) -> Tuple[str, Optional[str]]:
+    def generate_assistant_response(
+        self,
+        generate_terminal_command: bool,
+        use_wolfram_alpha: bool,
+        query: str,
+        english_query: str,
+        meta_call: bool,
+    ) -> Tuple[str, Optional[str]]:
         """
         Generate an appropriate response based on the input query and various conditions.
 
@@ -165,11 +192,15 @@ class ConversationManager(RequestManager):
         assistant_answer = None
 
         if use_wolfram_alpha:
-            assistant_answer, wolfram_alpha_error = ConversationManager.wolfram_alpha().query(english_query)
+            assistant_answer, wolfram_alpha_error = (
+                ConversationManager.wolfram_alpha().query(english_query)
+            )
 
             if wolfram_alpha_error:
                 use_wolfram_alpha = False
-                OutputManager.print_formatted("Wolfram|Alpha error", wolfram_alpha_error)
+                OutputManager.print_formatted(
+                    "Wolfram|Alpha error", wolfram_alpha_error
+                )
                 self.augment_context_introspectively(english_query)
             else:
                 OutputManager.print_formatted("Wolfram|Alpha answer", assistant_answer)
@@ -178,11 +209,20 @@ class ConversationManager(RequestManager):
             self.append_user_message(query)
 
         if not use_wolfram_alpha:
-            assistant_answer = self.send_model_request(model_interface.get_request(self.messages))
+            assistant_answer = self.send_model_request(
+                model_interface.get_request(self.messages)
+            )
 
-            if Configuration.get()['OFFER_CMD_EXECUTION'] and generate_terminal_command and not meta_call:
-                translated_request_to_user: str = text_processors_ai.ensure_language("""I suggest a command to be executed.
-Please focus the terminal window to confirm.""", context.get_user_language())
+            if (
+                Configuration.get()["OFFER_CMD_EXECUTION"]
+                and generate_terminal_command
+                and not meta_call
+            ):
+                translated_request_to_user: str = text_processors_ai.ensure_language(
+                    """I suggest a command to be executed.
+Please focus the terminal window to confirm.""",
+                    context.get_user_language(),
+                )
                 code = text_processors_regex.edit_output_for_terminal(assistant_answer)
                 ConversationManager.code_input_global().put(code)
                 ConversationManager.code_input_event().set()
@@ -191,11 +231,12 @@ Please focus the terminal window to confirm.""", context.get_user_language())
         return assistant_answer.strip(), None
 
     def generate_response_based_on_input_type(
-            self,
-            generate_terminal_command: bool,
-            meta_call: bool,
-            query: str,
-            is_english: bool = False) -> Tuple[str, Optional[str]]:
+        self,
+        generate_terminal_command: bool,
+        meta_call: bool,
+        query: str,
+        is_english: bool = False,
+    ) -> Tuple[str, Optional[str]]:
         """
         Generate a response based on the type of input and various conditions.
 
@@ -218,7 +259,7 @@ Please focus the terminal window to confirm.""", context.get_user_language())
             This method handles debug output, language translation for Wolfram|Alpha queries,
             and determines whether to use Wolfram|Alpha based on the input type and settings.
         """
-        if Configuration.get()['SHOW_DEBUG_MESSAGES']:
+        if Configuration.get()["SHOW_DEBUG_MESSAGES"]:
             print("----------------------------------------------------------------")
             print("Message queue:")
             print("----------------------------------------------------------------")
@@ -231,35 +272,64 @@ Please focus the terminal window to confirm.""", context.get_user_language())
             english_query = None
             use_wolfram_alpha = False
         else:
-            force_wolfram_alpha = ConversationManager.force_wolfram_alpha() and self.is_first_reply()
-            english_query = query if is_english or force_wolfram_alpha else text_processors_ai.ensure_language(query, "English")
-            use_wolfram_alpha = (force_wolfram_alpha
-                                 or (Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'] is not None
-                                     and Configuration.get()['WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID'] != ""
-                                     and input_analyzers_ai.query_is_suitable_for_wolfram_alpha(english_query, self.messages)))
+            force_wolfram_alpha = (
+                ConversationManager.force_wolfram_alpha() and self.is_first_reply()
+            )
+            english_query = (
+                query
+                if is_english or force_wolfram_alpha
+                else text_processors_ai.ensure_language(query, "English")
+            )
+            use_wolfram_alpha = force_wolfram_alpha or (
+                Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"] is not None
+                and Configuration.get()["WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID"] != ""
+                and input_analyzers_ai.query_is_suitable_for_wolfram_alpha(
+                    english_query, self.messages
+                )
+            )
 
             if self.ica() and not use_wolfram_alpha:
                 self.augment_context_introspectively(english_query)
                 ica = True
 
-        assistant_answer, code = self.generate_assistant_response(generate_terminal_command, use_wolfram_alpha, query, english_query, meta_call)
+        assistant_answer, code = self.generate_assistant_response(
+            generate_terminal_command,
+            use_wolfram_alpha,
+            query,
+            english_query,
+            meta_call,
+        )
 
-        if ica and not code and not input_analyzers_ai.are_you_sure(assistant_answer, self.messages):
-            critical_question = text_processors_ai.generate_critical_question(assistant_answer, self.messages)
+        if (
+            ica
+            and not code
+            and not input_analyzers_ai.are_you_sure(assistant_answer, self.messages)
+        ):
+            critical_question = text_processors_ai.generate_critical_question(
+                assistant_answer, self.messages
+            )
             OutputManager.print_formatted("critical question", critical_question)
 
-            answer_to_critical_question = ConversationManager(self.messages).process_input(critical_question)[0]
-            OutputManager.print_formatted("answer to critical question", answer_to_critical_question)
+            answer_to_critical_question = ConversationManager(
+                self.messages
+            ).process_input(critical_question)[0]
+            OutputManager.print_formatted(
+                "answer to critical question", answer_to_critical_question
+            )
             self.append_assistant_message(assistant_answer)
             self.append_user_message(critical_question)
             self.append_assistant_message(answer_to_critical_question)
 
-            assistant_answer = ConversationManager(self.messages).process_input(english_query)[0]
+            assistant_answer = ConversationManager(self.messages).process_input(
+                english_query
+            )[0]
             self.append_user_message(query)
 
         return assistant_answer, code
 
-    def process_input(self, query: str, meta_call: bool = True) -> Tuple[str, Optional[str]]:
+    def process_input(
+        self, query: str, meta_call: bool = True
+    ) -> Tuple[str, Optional[str]]:
         """
         Process user input and generate an appropriate response.
 
@@ -273,7 +343,10 @@ Please focus the terminal window to confirm.""", context.get_user_language())
         query = query.strip()
 
         if meta_call:
-            if ConversationManager.pastime_mode() and Configuration.get()['SHOW_DEBUG_MESSAGES']:
+            if (
+                ConversationManager.pastime_mode()
+                and Configuration.get()["SHOW_DEBUG_MESSAGES"]
+            ):
                 print("------------------------------------------------")
                 print(query)
                 print("------------------------------------------------")
@@ -282,27 +355,42 @@ Please focus the terminal window to confirm.""", context.get_user_language())
         else:
             OutputManager.reset_history()
 
-        if Configuration.get()['SHOW_DEBUG_MESSAGES']:
+        if Configuration.get()["SHOW_DEBUG_MESSAGES"]:
             if meta_call:
                 print(f"""Meta call received ("{truncate_string(query)}..."")""")
             else:
                 print(f"""User input received ("{truncate_string(query)}..."")""")
 
         generate_terminal_command: Final = (
-                Configuration.get()['GENERATE_TERMINAL_CMD']
-                and not meta_call
-                and query != ""
-                and (not ConversationManager.force_wolfram_alpha() or not self.is_first_reply())
-                and input_analyzers_ai.query_refers_to_a_computer(query)
+            Configuration.get()["GENERATE_TERMINAL_CMD"]
+            and not meta_call
+            and query != ""
+            and (
+                not ConversationManager.force_wolfram_alpha()
+                or not self.is_first_reply()
+            )
+            and input_analyzers_ai.query_refers_to_a_computer(query)
         )
 
-        if (Configuration.get()['SHOW_DEBUG_MESSAGES']
-                and Configuration.get()['GENERATE_TERMINAL_CMD'] and not meta_call):
-            print("User input can be solved with terminal: " + str(generate_terminal_command))
+        if (
+            Configuration.get()["SHOW_DEBUG_MESSAGES"]
+            and Configuration.get()["GENERATE_TERMINAL_CMD"]
+            and not meta_call
+        ):
+            print(
+                "User input can be solved with terminal: "
+                + str(generate_terminal_command)
+            )
 
-        modified_query: Final = context.generate_terminal_command(query) if generate_terminal_command else query
+        modified_query: Final = (
+            context.generate_terminal_command(query)
+            if generate_terminal_command
+            else query
+        )
 
-        assistant_answer, code = self.generate_response_based_on_input_type(generate_terminal_command, meta_call, modified_query)
+        assistant_answer, code = self.generate_response_based_on_input_type(
+            generate_terminal_command, meta_call, modified_query
+        )
 
         if modified_query != query:
             # Replace the modified message that forced the generation of a terminal command with the original message

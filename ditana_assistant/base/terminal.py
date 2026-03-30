@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -44,7 +44,7 @@ def get_valid_input(question_text):
     """
     while True:
         reply = input(f"{question_text} (y/n) ").lower()
-        if reply in ['y', 'n']:
+        if reply in ["y", "n"]:
             return reply
         print("Invalid input. Please enter 'y' or 'n'.")
 
@@ -63,23 +63,23 @@ def run_interactive_command_unix(command: str) -> Tuple[int, str]:
     import select
 
     env = os.environ.copy()
-    env['PAGER'] = 'cat'
-    env['SYSTEMD_PAGER'] = ''
-    env['LESS'] = '-F -X'
-    env['COLUMNS'] = '500'
-    env['LINES'] = '5000'
+    env["PAGER"] = "cat"
+    env["SYSTEMD_PAGER"] = ""
+    env["LESS"] = "-F -X"
+    env["COLUMNS"] = "500"
+    env["LINES"] = "5000"
 
     master, slave = pty.openpty()
     output = []
     try:
         with subprocess.Popen(
-                command,
-                shell=True,
-                stdin=slave,
-                stdout=slave,
-                stderr=slave,
-                close_fds=True,
-                env=env
+            command,
+            shell=True,
+            stdin=slave,
+            stdout=slave,
+            stderr=slave,
+            close_fds=True,
+            env=env,
         ) as process:
             os.close(slave)
 
@@ -108,7 +108,7 @@ def run_interactive_command_unix(command: str) -> Tuple[int, str]:
     finally:
         os.close(master)
 
-    full_output = b''.join(output).decode('utf-8', errors='replace')
+    full_output = b"".join(output).decode("utf-8", errors="replace")
     return return_code, full_output
 
 
@@ -131,7 +131,7 @@ def run_interactive_command_windows(command: str) -> Tuple[int, str]:
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
     ) as process:
         while True:
             line = process.stdout.readline()
@@ -144,7 +144,7 @@ def run_interactive_command_windows(command: str) -> Tuple[int, str]:
         process.wait()
         return_code = process.returncode
 
-    full_output = ''.join(output)
+    full_output = "".join(output)
     return return_code, full_output
 
 
@@ -158,7 +158,7 @@ def run_interactive_command(command: str) -> Tuple[int, str]:
     Returns:
         tuple: A tuple containing the return code and the command output.
     """
-    if os.name == 'nt':
+    if os.name == "nt":
         return run_interactive_command_windows(command)
 
     return run_interactive_command_unix(command)

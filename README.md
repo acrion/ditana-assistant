@@ -14,16 +14,16 @@ Simply ask your question in natural language, for example
 - _Is the network name resolution service running stably?_
 - _Which process is consuming so much CPU time?_
 - _Replace all occurrences of the word 'sun' with 'moon' in the file ./project/test_
-- _What’s my current audio device?_
+- _What's my current audio device?_
 
 For complete sessions, see [Examples](#example-sessions).
 
 ## Key Features
 
-- **AI Integration**: Uses a [KoboldCpp](https://github.com/LostRuins/koboldcpp/wiki) server with the [Google Gemma model](https://ai.google.dev/gemma/docs/base).
-- **Flexible Configuration**: Can be configured to use OpenAI models through a simple YAML [configuration file](#configuration).
+- **Flexible Model Support**: Works with any provider offering an OpenAI-compatible chat completions API, including local solutions like [Ollama](https://ollama.com) and [LM Studio](https://lmstudio.ai), cloud services like [OpenAI](https://openai.com), [Groq](https://groq.com), [Together AI](https://together.ai), and [OpenRouter](https://openrouter.ai), as well as [KoboldCpp](https://github.com/LostRuins/koboldcpp/wiki) with Gemma models.
+- **Ready Out of the Box**: Defaults to [Ollama](https://ollama.com) with [Phi-4-mini](https://ollama.com/library/phi4-mini) for local, private inference — no API key or cloud account needed.
 - **OS Interaction**: Capable of interacting with the operating system, suggesting and executing terminal commands upon user confirmation, see [example sessions](#terminal-command-generation-examples).
-- **Optional Wolfram|Alpha Integration**: Automatically attempts to augment the LLM’s context via communication with the official [Wolfram|Alpha Short Answers API](https://products.wolframalpha.com/short-answers-api/explorer).
+- **Optional Wolfram|Alpha Integration**: Automatically attempts to augment the LLM's context via communication with the official [Wolfram|Alpha Short Answers API](https://products.wolframalpha.com/short-answers-api/explorer).
 - **Introspective Contextual Augmentation (ICA)**: Enhances AI responses by automatically gathering and incorporating relevant contextual information through introspective reasoning.
   See [Introspective Contextual Augmentation](#introspective-contextual-augmentation-ica) for more details.
 - **Multi-Platform**: Runs on Linux, macOS, and Windows, adapting to each environment automatically by [collecting context of the running system](#assistance-based-on-your-specific-system).
@@ -41,17 +41,19 @@ For complete sessions, see [Examples](#example-sessions).
   - [Pastime Mode](#pastime-mode)
   - [Intelligent Caching](#intelligent-caching)
 - [Installation](#installation)
+  - [PyPI (all platforms)](#pypi-all-platforms)
+  - [Setting Up a Local Model with Ollama (recommended)](#setting-up-a-local-model-with-ollama-recommended)
   - [Ditana GNU/Linux](#ditana-linux)
-  - [Arch Linux and Arch-based Distributions](#arch-linux-and-arch-based-distributions)
-  - [Other Linux Distributions, Windows, and macOS](#other-linux-distributions-windows-and-macos)
-  - [Prerequisites](#prerequisites)
+  - [Development Setup](#development-setup)
 - [Configuration](#configuration)
   - [Available Configuration Options:](#available-configuration-options)
   - [Configuration Option Details](#configuration-option-details)
   - [Using OpenAI](#using-openai)
+  - [Using OpenAI-Compatible Providers](#using-openai-compatible-providers)
+  - [Using KoboldCpp with Gemma](#using-koboldcpp-with-gemma)
   - [Using Wolfram|Alpha](#using-wolframalpha)
 - [Use Cases](#use-cases)
-  - [Maximizing the Underlying AI Model’s Potential](#maximizing-the-underlying-ai-models-potential)
+  - [Maximizing the Underlying AI Model's Potential](#maximizing-the-underlying-ai-models-potential)
   - [Terminal Command Generation](#terminal-command-generation)
   - [Assistance Based on Your Specific System](#assistance-based-on-your-specific-system)
   - [All Use Cases of Wolfram|Alpha](#all-use-cases-of-wolframalpha)
@@ -99,7 +101,7 @@ For instance, you can use Ditana Assistant as a sophisticated calculator:
 the 1st is x equals minus 1 minus 2 times i and the 2nd is x equals minus 1 plus 2 times i
 ```
 
-This example demonstrates a direct output from Wolfram|Alpha’s Short Answers API, used for immediately suitable queries.
+This example demonstrates a direct output from Wolfram|Alpha's Short Answers API, used for immediately suitable queries.
 Therefore, the language style of the output can be more formal than the natural style of LLMs.
 However, in the majority of cases, Ditana Assistant employs Wolfram|Alpha internally for [Introspective Contextual Augmentation](#key-features),
 enabling a powerful synergy between Wolfram|Alpha and the LLM to generate more comprehensive responses.
@@ -108,7 +110,7 @@ The complexity of the responses scales with the nature of your query.
 For more intricate tasks, Ditana Assistant can provide detailed, comprehensive answers.
 Please refer to the [Example Sessions](#example-sessions) section for demonstrations of more advanced use cases.
 
-Note: The `--quiet` flag is used in this example to display only the assistant’s response without additional output.
+Note: The `--quiet` flag is used in this example to display only the assistant's response without additional output.
 
 ### GUI Mode
 
@@ -122,12 +124,12 @@ ditana-assistant -u
 
 This screenshot illustrates the seamless integration of real-time data from the Wolfram|Alpha API, which is automatically accessed as needed. The assistant leverages this capability to provide up-to-date and context-aware responses.
 
-For a more comprehensive understanding of the assistant’s capabilities, please refer to the [Use Cases](#maximizing-the-underlying-ai-models-potential) and [Example Sessions](#example-sessions).
+For a more comprehensive understanding of the assistant's capabilities, please refer to the [Use Cases](#maximizing-the-underlying-ai-models-potential) and [Example Sessions](#example-sessions).
 
 ### Pastime Mode
 
 Pastime mode allows users to engage in human-like conversations with the AI assistant.
-This feature is particularly effective when using more advanced language models like gpt-4o-mini (see section [Configuration](#configuration))
+This feature is particularly effective when using more advanced language models (see section [Configuration](#configuration)).
 
 To activate Pastime mode:
 
@@ -142,16 +144,16 @@ ditana-assistant -p -i "Detective Sherlock Holmes"
 Ah, good afternoon. So you're the one who asked me for help.
 Please tell me everything you know about the incident.
 
-Your Message (‘enter’ to quit): All I know is that there was a lot of fog.
+Your Message ('enter' to quit): All I know is that there was a lot of fog.
 I could hardly see anything. And suddenly the car was gone. Just disappeared. It was terrible.
 
 Interesting. Can you tell me more about the car? Make, colour, registration number?
 
-Your Message (‘enter’ to quit): It was a green VW Beetle. Licence plate number MN P-16.
+Your Message ('enter' to quit): It was a green VW Beetle. Licence plate number MN P-16.
 
 Thank you for the information. Did you see any suspects or people behaving suspiciously?
 
-Your Message (‘enter’ to quit): Precisely not, because of the fog. I only remember that,
+Your Message ('enter' to quit): Precisely not, because of the fog. I only remember that,
 strangely enough, a parrot flew past just before the incident. That's very strange,
 because parrots are not native to this area.
 
@@ -163,7 +165,7 @@ The above conversation was done using `gpt-3.5-turbo`. Another example, using `g
 
 <img src="pastime-sample.png" alt="Pastime Mode" width="40%" height="40%">
 
-Note: While Pastime mode is functional with the Gemma model, it performs best with more advanced models like gpt-4o-mini. The conversations with Gemma may be less engaging and limited in scope.
+Note: While Pastime mode works with any supported model, conversations are more engaging with more capable models. If using a cloud provider like OpenAI, models like gpt-4o-mini provide excellent results.
 
 ### Intelligent Caching
 
@@ -182,17 +184,81 @@ This caching mechanism significantly reduces API calls, especially for short, re
 
 ## Installation
 
+### PyPI (all platforms)
+
+The simplest way to install Ditana Assistant on Linux, macOS, and Windows:
+
+```bash
+pip install ditana-assistant
+```
+
+After installation, run it with:
+
+```bash
+ditana-assistant
+```
+
+### Setting Up a Local Model with Ollama (recommended)
+
+By default, Ditana Assistant connects to a local [Ollama](https://ollama.com) instance running the [Phi-4-mini](https://ollama.com/library/phi4-mini) model. This provides fully private, local inference with no API key or cloud account required.
+
+#### Installing Ollama
+
+**Linux:**
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+On Arch Linux (including Ditana GNU/Linux), you can alternatively install from the official repositories. For NVIDIA GPUs:
+
+```bash
+sudo pacman -S ollama ollama-cuda
+sudo systemctl enable --now ollama.service
+```
+
+**macOS:**
+
+Download the installer from [ollama.com/download](https://ollama.com/download) or install via Homebrew:
+
+```bash
+brew install ollama
+ollama serve
+```
+
+**Windows:**
+
+Download the installer from [ollama.com/download](https://ollama.com/download) and run it. Ollama will start automatically as a background service.
+
+#### Downloading the Default Model
+
+Once Ollama is running, pull the default model:
+
+```bash
+ollama pull phi4-mini
+```
+
+That's it — Ditana Assistant will now work with its default configuration. You can verify the setup by running:
+
+```bash
+ollama run phi4-mini "Hello, how are you?"
+```
+
+#### Alternative Backends
+
+Ditana Assistant is not limited to Ollama. It works with any provider that offers an OpenAI-compatible `/v1/chat/completions` endpoint, including cloud services like OpenAI, Groq, and Together AI, as well as other local solutions like LM Studio. See [Using OpenAI-Compatible Providers](#using-openai-compatible-providers) for details.
+
+For users who prefer KoboldCpp with Gemma models, this is still supported via the `gemma` model type. See [Using KoboldCpp with Gemma](#using-koboldcpp-with-gemma).
+
 ### Ditana GNU/Linux
 
 Ditana Assistant is integrated into the Ditana GNU/Linux distribution with native Arch packages. For more information, visit [https://ditana.org](https://ditana.org).
 
-The corresponding package in the Ditana Arch repository is `ditana-assistant`. Note that this package does not depend on the [ditana-koboldcpp AUR package](https://aur.archlinux.org/packages/ditana-koboldcpp), because you have free choice of which AI API you want to use, including OpenAI.
-`ditana-koboldcpp` includes an optimized configuration for the Gemma language model.
-In KoboldCpp operation mode, the assistant makes use of [Gemma’s prompt format](https://ai.google.dev/gemma/docs/formatting).
+The corresponding package in the Ditana Arch repository is `ditana-assistant`. Note that this package does not depend on a specific AI backend — you have free choice of which provider you want to use, including cloud services like OpenAI.
 
-### Other Linux Distributions, Windows, and macOS
+### Development Setup
 
-For other platforms, including Windows and macOS, you can install Ditana Assistant from source using [Poetry](https://python-poetry.org):
+For contributors or if you prefer to run from source using [Poetry](https://python-poetry.org):
 
 1. Clone the repository:
 
@@ -205,23 +271,12 @@ For other platforms, including Windows and macOS, you can install Ditana Assista
    ```bash
    pip install poetry
    ```
-3. Install ditana-assistant’s dependencies:
+3. Install dependencies and enter the virtual environment:
 
    ```bash
    poetry install
-   ```
-
-   This command will create a virtual environment (if one does not already exist) and install all dependencies listed in the `pyproject.toml` file.
-   To execute ditana-assistant, you need to spawn a shell within the virtual environment with this command:
-
-   ```bash
    poetry shell
    ```
-
-   The dependencies include either an [OpenAI API key](https://platform.openai.com/account/api-keys) or a local [KoboldCpp server](https://github.com/LostRuins/koboldcpp/wiki).
-   For the latter, please consider using Google’s [Gemma LLM](https://ai.google.dev/gemma) ([Download](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q6_K.gguf)),
-   as Ditana Assistant utilizes [Gemma’s Instruct Tag Format](https://ai.google.dev/gemma/docs/formatting).
-   For this, you should select the Instruct Tag Preset `Gemma 2` in KoboldCpp’s Format settings.
 
 #### Why no requirements.txt?
 
@@ -230,22 +285,6 @@ Poetry provides a `pyproject.toml` file to define dependencies and a `poetry.loc
 This approach simplifies dependency management by ensuring that all environments use the exact same versions, reducing potential conflicts.
 
 For more information on how Poetry manages dependencies, visit the [Poetry documentation](https://python-poetry.org/docs/).
-
-### Prerequisites
-
-Ditana Assistant supports two main operating modes:
-
-1. **Local operation with KoboldCpp:**
-   - A running [KoboldCpp server](https://github.com/LostRuins/koboldcpp/wiki) is required.
-   - In KoboldCpp operation mode, the Ditana Assistant makes use of [Gemma’s prompt format](https://ai.google.dev/gemma/docs/formatting).
-   - You can download the recommended model here: [gemma-2-2b-it-GGUF](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF).
-   - Arch Linux users can get everything required by installing the [ditana-koboldcpp AUR package](https://aur.archlinux.org/packages/ditana-koboldcpp).
-
-2. **Cloud-based operation with OpenAI API:**
-   - Alternatively, you can use the OpenAI API without any local model setup.
-   - This requires [configuration](#configuration) and an [OpenAI API key](https://platform.openai.com/account/api-keys).
-
-Choose the mode that best fits your needs and system capabilities.
 
 ## Configuration
 
@@ -264,9 +303,10 @@ generate_terminal_cmd: true
 koboldcpp_base_url: http://localhost:5001 # when using Gemma
 model_cache_size: 20
 model_cache_start_lifetime_sec: 604800
-model_type: gemma # or 'openai'
+model_type: openai # or 'gemma' for use with KoboldCpp
 offer_cmd_execution: true
-openai_model: gpt-4o-mini # when using OpenAI
+openai_base_url: http://localhost:11434 # Default is for ollama - any OpenAI-compatible provider works, e.g. https://api.openai.com
+openai_model: phi4-mini # when using OpenAI or compatible provider
 show_debug_messages: false
 wolfram_alpha_cache_size: 1
 wolfram_alpha_cache_start_lifetime_sec: 675
@@ -279,16 +319,18 @@ wolfram_alpha_short_answers_app_id: "" # https://developer.wolframalpha.com
 
 #### Core Functionality Settings
 
-- `model_type`: Specifies the AI model to use. Currently, `gemma` for KoboldCpp and `openai` for OpenAI models are supported. Also see [Using OpenAI](#using-openai).
-  Default: `gemma` (requires local [KoboldCpp server](#prerequisites))
+- `model_type`: Specifies the AI model to use. Currently, `gemma` for KoboldCpp and `openai` for OpenAI-compatible providers are supported. Also see [Using OpenAI](#using-openai).
+  Default: `openai` (`gemma` requires local [KoboldCpp server](#using-koboldcpp-with-gemma))
 
 - `koboldcpp_base_url`: The base URL of the KoboldCpp server, used when `model_type` is set to `gemma`. Default: `http://localhost:5001`
 
-- `openai_model`: The specific OpenAI model to use when model_type is set to openai, see [Using OpenAI](#using-openai). Default: `gpt-4o-mini`
+- `openai_model`: The specific model to use when `model_type` is set to `openai`. This applies to any OpenAI-compatible provider, not just OpenAI itself. See [Using OpenAI-Compatible Providers](#using-openai-compatible-providers). Default: `phi4-mini`
 
-- `wolfram_alpha_short_answers_app_id`: The App ID for Wolfram|Alpha’s Short Answers API, see [Using Wolfram|Alpha](#using-wolframalpha). Default: `''`'
+- `openai_base_url`: The base URL for the OpenAI-compatible API. Change this to use alternative providers that offer an OpenAI-compatible chat completions endpoint. Default: `http://localhost:11434` (for Ollama)
 
-- `generate_terminal_cmd`: If enabled, the wizard will analyse the user’s input to see if it relates to their computer and can be solved by a terminal command. The terminal command is only offered for execution if `offer_cmd_execution` is also enabled. Default: `true`.
+- `wolfram_alpha_short_answers_app_id`: The App ID for Wolfram|Alpha's Short Answers API, see [Using Wolfram|Alpha](#using-wolframalpha). Default: `''`'
+
+- `generate_terminal_cmd`: If enabled, the wizard will analyse the user's input to see if it relates to their computer and can be solved by a terminal command. The terminal command is only offered for execution if `offer_cmd_execution` is also enabled. Default: `true`.
 
 - `offer_cmd_execution`: If enabled, the assistant will offer to execute detected terminal commands based on the output. This usually happens together with `generate_terminal_cmd`, but not necessarily. Default: `true`.
 
@@ -303,7 +345,7 @@ wolfram_alpha_short_answers_app_id: "" # https://developer.wolframalpha.com
 
 - `model_cache_start_lifetime_sec`: The initial lifetime (in seconds) for model cache entries. When this period expires, the cache entry is re-evaluated; if a new response matches the cached one, the lifetime is extended, otherwise, it is shortened. Default: `604800` seconds (1 week).
 
-- `show_debug_messages`: Controls whether debug messages are displayed during the assistant’s operation. Useful for troubleshooting. Default: `false`.
+- `show_debug_messages`: Controls whether debug messages are displayed during the assistant's operation. Useful for troubleshooting. Default: `false`.
 
 - `wolfram_alpha_cache_size`: Maximum size (in MiB) of the cache used for storing responses from the Wolfram|Alpha API. The actual file size will be approximately 1/3 larger due to JSON syntax. Default: `1` MiB.
 
@@ -315,13 +357,86 @@ wolfram_alpha_short_answers_app_id: "" # https://developer.wolframalpha.com
 
 ### Using OpenAI
 
-Set the `OPENAI_API_KEY` environment variable with your [OpenAI API key](https://platform.openai.com/account/api-keys) when configuring OpenAI models (see below config entries `model_type` and `openai_model`).
+To use OpenAI's models, set the `OPENAI_API_KEY` environment variable with your [OpenAI API key](https://platform.openai.com/account/api-keys) and configure the following:
+
+```yaml
+model_type: openai
+openai_base_url: https://api.openai.com
+openai_model: gpt-4o-mini
+```
+
 As of October 2024, gpt-4o-mini is a factor of 20 cheaper than gpt-3.5-turbo: [$0.150 / 1M input tokens](https://openai.com/api/pricing).
 According to [https://platform.openai.com/docs/models/gpt-3-5-turbo](https://platform.openai.com/docs/models/gpt-3-5-turbo):
 
 > "As of July 2024, gpt-4o-mini should be used in place of gpt-3.5-turbo, as it is cheaper, more capable, multimodal, and just as fast. gpt-3.5-turbo is still available for use in the API."
 
-Note that the number of API accesses is reduced by Ditana Assistant’s sophisticated [caching algorithm](#intelligent-caching).
+Note that the number of API accesses is reduced by Ditana Assistant's sophisticated [caching algorithm](#intelligent-caching).
+
+### Using OpenAI-Compatible Providers
+
+Ditana Assistant can work with any provider that offers an OpenAI-compatible `/v1/chat/completions` endpoint. This includes services such as [Groq](https://groq.com), [Together AI](https://together.ai), [OpenRouter](https://openrouter.ai), [Mistral AI](https://mistral.ai), and locally hosted solutions like [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai).
+
+To use an alternative provider, set the following in your [configuration file](#configuration):
+
+```yaml
+model_type: openai
+openai_base_url: https://api.example.com # replace with the provider's base URL
+openai_model: provider-specific-model-name
+```
+
+Set the `OPENAI_API_KEY` environment variable to the API key provided by your chosen service (most providers use the same authentication scheme).
+
+#### Examples
+
+**Groq:**
+
+```yaml
+model_type: openai
+openai_base_url: https://api.groq.com/openai
+openai_model: llama-3.3-70b-versatile
+```
+
+**Together AI:**
+
+```yaml
+model_type: openai
+openai_base_url: https://api.together.xyz
+openai_model: meta-llama/Llama-3.3-70B-Instruct-Turbo
+```
+
+**Ollama (local):**
+
+```yaml
+model_type: openai
+openai_base_url: http://localhost:11434
+openai_model: phi4-mini
+```
+
+Note: Ollama does not require an API key. This is the default configuration.
+
+**LM Studio (local):**
+
+```yaml
+model_type: openai
+openai_base_url: http://localhost:1234
+openai_model: loaded-model-name
+```
+
+Note: LM Studio does not require an API key.
+
+### Using KoboldCpp with Gemma
+
+For users who prefer to use [KoboldCpp](https://github.com/LostRuins/koboldcpp/wiki) with Google's Gemma model, this is still fully supported:
+
+1. Install and run a KoboldCpp server with the recommended [Gemma model](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q6_K.gguf).
+2. Set the following configuration:
+
+```yaml
+model_type: gemma
+koboldcpp_base_url: http://localhost:5001
+```
+
+Arch Linux users can get everything required by installing the [ditana-koboldcpp AUR package](https://aur.archlinux.org/packages/ditana-koboldcpp), which includes an optimized configuration for the Gemma language model. In KoboldCpp operation mode, the assistant makes use of [Gemma's prompt format](https://ai.google.dev/gemma/docs/formatting).
 
 ### Using Wolfram|Alpha
 
@@ -330,15 +445,15 @@ Make sure to select `Short Answers API` in the dialog:
 <img src="wolfram_alpha_short_answers_api_key.png" alt="Wolfram Alpha Short Answers API Key" width="50%" height="50%">
 
 Currently, 2000 accesses per month [are free](https://products.wolframalpha.com/api).
-Note that the number of API accesses is reduced by Ditana Assistant’s sophisticated [caching algorithm](#intelligent-caching).
+Note that the number of API accesses is reduced by Ditana Assistant's sophisticated [caching algorithm](#intelligent-caching).
 
 ## Use Cases
 
-### Maximizing the Underlying AI Model’s Potential
+### Maximizing the Underlying AI Model's Potential
 
 Ditana Assistant is designed to maximize the potential of its underlying AI model, offering capabilities that surpass typical browser-based interactions:
 
-1. **[Integration of Multiple Knowledge Sources](#ica-example-1-using-gpt-35-turbo-and-wolframalpha)**: By combining the AI model’s capabilities with Wolfram|Alpha’s factual database (when enabled), Ditana Assistant offers a broader range of assistance, from creative problem-solving to precise calculations and up-to-date information.
+1. **[Integration of Multiple Knowledge Sources](#ica-example-1-using-gpt-35-turbo-and-wolframalpha)**: By combining the AI model's capabilities with Wolfram|Alpha's factual database (when enabled), Ditana Assistant offers a broader range of assistance, from creative problem-solving to precise calculations and up-to-date information.
 
 2. **[Introspective Contextual Augmentation (ICA)](#introspective-contextual-augmentation-ica)**: By introspectively augmenting the context of queries, Ditana Assistant provides more accurate and relevant responses. This feature improves AI answers in many cases, even when used without Wolfram|Alpha.
 
@@ -357,7 +472,7 @@ See [Example Section](#terminal-command-generation-examples) for demonstration.
 
 ### Assistance Based on Your Specific System
 
-Currently, the following information is collected from your system to tailor the LLM’s answers to your needs:
+Currently, the following information is collected from your system to tailor the LLM's answers to your needs:
 
 - The type of shell you started the Assistant from (important for terminal commands)
 - The desktop type
@@ -374,7 +489,7 @@ Currently, the following information is collected from your system to tailor the
 
 ### Introspective Contextual Augmentation (ICA)
 
-Introspective Contextual Augmentation is a powerful feature of Ditana Assistant that [significantly](#statistical-evaluation-and-optimization) enhances the quality and accuracy of AI responses. This innovative approach creates a synergy between various knowledge sources, including the AI model’s own introspective capabilities and Wolfram|Alpha (when enabled).
+Introspective Contextual Augmentation is a powerful feature of Ditana Assistant that [significantly](#statistical-evaluation-and-optimization) enhances the quality and accuracy of AI responses. This innovative approach creates a synergy between various knowledge sources, including the AI model's own introspective capabilities and Wolfram|Alpha (when enabled).
 
 **Note: This feature is turned off by default.** Users can enable it through the UI or by using the `-a` command line switch when using the terminal tool.
 
@@ -389,7 +504,7 @@ Introspective Contextual Augmentation is a powerful feature of Ditana Assistant 
    - Without Wolfram|Alpha: Engages in self-dialogue, using the underlying LLM to answer contextual queries, enhancing response quality through introspection.
 
 3. **Adaptive Contextual Queries**:
-   - Dynamically generates relevant questions based on the user’s input.
+   - Dynamically generates relevant questions based on the user's input.
    - These questions are answered either by Wolfram|Alpha or the LLM itself, creating a form of "inner monologue".
 
 4. **Guided Introspective Reasoning**:
@@ -412,7 +527,7 @@ Introspective Contextual Augmentation is a powerful feature of Ditana Assistant 
 
 #### Example of ICA in Action
 
-To illustrate how ICA works, here’s an example from the [MMLU multitask test](https://huggingface.co/datasets/cais/mmlu) (without using Wolfram|Alpha):
+To illustrate how ICA works, here's an example from the [MMLU multitask test](https://huggingface.co/datasets/cais/mmlu) (without using Wolfram|Alpha):
 
 ```
 Question: A victim and a defendant both worked as longshoremen at a shipyard. After the victim
@@ -435,14 +550,14 @@ E. inadmissible, because it is hearsay not within any recognized exception.
 
 Correct answer: C
 
-Model’s answer (without ICA feature): E
+Model's answer (without ICA feature): E
 
                             systematic contextual query: "What legal principle governs the admissibility of the witness's testimony regarding the defendant..."
                              answer to systematic query: "In the scenario, a victim and a defendant, both longshoremen at a shipyard, were involved in a ca..."
    Are you sure? Please answer only with "yes" or "no".: "no."
                                       critical question: "What specific hearsay exception could potentially apply to the defendant's statement, and how mig..."
                             answer to critical question: "The specific hearsay exception that could potentially apply to the defendant's statement is the "..."
-Model’s answer (with ICA feature): C
+Model's answer (with ICA feature): C
 ```
 
 This example demonstrates how ICA guides the model through a series of contextual queries, helping it arrive at the correct answer.
@@ -483,7 +598,7 @@ of the internal processes. While additional log outputs [can be enabled](#advanc
    - ARC-Challenge test: Fixed 26 out of 94 initially incorrect answers.
 
 3. **Statistical Significance**:
-   - Employed [McNemar’s statistical test](https://en.wikipedia.org/wiki/McNemar's_test) to verify improvements.
+   - Employed [McNemar's statistical test](https://en.wikipedia.org/wiki/McNemar's_test) to verify improvements.
    - Achieved over 99% probability of significant differences in all cases.
    - Despite optimization on ARC-Challenge potentially affecting statistical significance, MMLU results confirmed the effectiveness.
 
@@ -501,7 +616,7 @@ The evaluation of Large Language Models (LLMs) on multiple-choice questions pres
 
 ##### Dataset Preparation and Prompt Engineering
 
-It’s crucial to note that many multiple-choice datasets, including those from HuggingFace like [ai2_arc](https://huggingface.co/datasets/allenai/ai2_arc) and [cais_mmlu](https://huggingface.co/datasets/cais/mmlu),
+It's crucial to note that many multiple-choice datasets, including those from HuggingFace like [ai2_arc](https://huggingface.co/datasets/allenai/ai2_arc) and [cais_mmlu](https://huggingface.co/datasets/cais/mmlu),
 provide only the question text and a list of answer choices.
 They do not include a pre-formatted prompt suitable for direct input to an LLM. Consequently, researchers must design an appropriate prompt structure.
 
@@ -522,20 +637,20 @@ Key aspects of this approach include:
 1. **Answer Choice Labeling**: The method ensures that answer choices begin with "B" rather than "A".
    This is crucial because "A" frequently appears as an article in English text, whereas "B", "C", "D", etc., are less likely to appear as standalone words.
 
-2. **Response Parsing**: The LLM’s response is analyzed for the presence of valid answer choice labels (e.g., "B", "C", "D") as whole words.
+2. **Response Parsing**: The LLM's response is analyzed for the presence of valid answer choice labels (e.g., "B", "C", "D") as whole words.
    This approach significantly reduces false positives compared to more complex semantic analysis methods.
 
 3. **Validation Criteria**:
    - A response is considered valid if exactly one answer choice label is present.
    - If multiple valid labels are detected, the response is deemed incorrect.
    - If no valid label is found, the response is also considered incorrect.
-   - The response is correct only if the detected label matches the dataset’s provided answer.
+   - The response is correct only if the detected label matches the dataset's provided answer.
 
 This method has shown high reliability in manual verification, outperforming the initially tested [bertscore](https://huggingface.co/spaces/evaluate-metric/bertscore) and Google Research [rouge](https://huggingface.co/spaces/evaluate-metric/rouge) metrics for this specific task.
 
 ##### Considerations and Future Work
 
-While this specialized method has proven effective, it’s important to acknowledge that the HuggingFace [evaluate](https://github.com/huggingface/evaluate) library may contain other evaluation methods specifically designed for multiple-choice questions that were not explored in this project.
+While this specialized method has proven effective, it's important to acknowledge that the HuggingFace [evaluate](https://github.com/huggingface/evaluate) library may contain other evaluation methods specifically designed for multiple-choice questions that were not explored in this project.
 Future work could involve a comprehensive comparison of this method against other potential evaluation techniques for multiple-choice responses.
 
 Moreover, the necessity of prompt engineering in working with these datasets highlights an important consideration in LLM evaluation: the impact of prompt design on model performance.
@@ -558,7 +673,7 @@ This aspect warrants further investigation and standardization efforts in the fi
      - Further development of recursive techniques with result summarization, expanding on the `generate_sub_prompts` function.
      - Continued optimization of the [Socratic method](https://en.wikipedia.org/wiki/Socratic_method) simulation, aiming to achieve statistically significant improvements.
      - Enhancement of query generation and dialogue construction methods to improve context understanding and response relevance.
-   - These developments aim to push the boundaries of the ICA feature’s capabilities while maintaining efficient API usage and overall performance.
+   - These developments aim to push the boundaries of the ICA feature's capabilities while maintaining efficient API usage and overall performance.
 
 4. **Open for Contributions**:
    - The Python codebase allows for easy integration of new ideas and techniques.
@@ -675,9 +790,9 @@ In this session, the user first inquires about the status of a service, then req
 
 **Request:** _"What should I wear today for a travel to New York?"_
 
-The response without ICA lacks specific information about today’s weather.
+The response without ICA lacks specific information about today's weather.
 But even without ICA, if Wolfram|Alpha is configured, Ditana Assistant will always assess whether the request is directly suitable for Wolfram|Alpha
-(which it is not in this case). Here, Ditana Assistant’s [System-Specific Context](#assistance-based-on-your-specific-system) proves helpful.
+(which it is not in this case). Here, Ditana Assistant's [System-Specific Context](#assistance-based-on-your-specific-system) proves helpful.
 It provides a more informed answer than one without even knowing the current month.
 
 The second response, with [ICA](#maximizing-the-underlying-ai-models-potential) enabled, automatically utilizes **real-time information** from Wolfram|Alpha to check the current temperature in New York.
@@ -701,7 +816,7 @@ The second response, with [ICA](#maximizing-the-underlying-ai-models-potential) 
 >                   does not refer to a computer: "What should I wear today for a travel to New York?"
 >                 not suitable for Wolfram|Alpha: "What should I wear today for a travel to New York?"
 >                               contextual query: "What is the average temperature in New York City on September 26th, 2024?"
->     Wolfram|Alpha’s answer to contextual query: "On Thursday, 26 September 2024, the mean temperature in New York City, United States, was 21 degr..."
+>     Wolfram|Alpha's answer to contextual query: "On Thursday, 26 September 2024, the mean temperature in New York City, United States, was 21 degr..."
 > ```
 >
 > For a trip to New York City on September 26th, 2024, you may want to wear comfortable clothing suitable for a temperature of around 21 degrees Celsius. It's always a good idea to bring layers, as the weather can change throughout the day. Additionally, consider bringing an umbrella or rain jacket as there may be a chance of rain. Enjoy your trip!
@@ -710,7 +825,7 @@ The second response, with [ICA](#maximizing-the-underlying-ai-models-potential) 
 
 **Request:** _"A ladder leaning against a wall reaches 4 meters up the wall. The bottom of the ladder is 3 meters from the wall. What is the angle between the ladder and the ground?"_
 
-A [detailed analysis by ChatGPT-o1](https://chatgpt.com/share/66f53751-4694-8009-ba49-5da7c2560253) on the quality of the following two responses shows that Ditana Assistant’s [ICA](#maximizing-the-underlying-ai-models-potential) can avoid fundamental errors in the output:
+A [detailed analysis by ChatGPT-o1](https://chatgpt.com/share/66f53751-4694-8009-ba49-5da7c2560253) on the quality of the following two responses shows that Ditana Assistant's [ICA](#maximizing-the-underlying-ai-models-potential) can avoid fundamental errors in the output:
 
 > - Answer 2 is correct, and it demonstrates a proper understanding and application of trigonometric functions, with all intermediate steps accurately calculated.
 > - Answer 1, while partially correct in its calculation, contains a **fundamental error** in explaining the trigonometric relationships and does not provide the final numerical value of the angle.
@@ -805,7 +920,7 @@ See [public link to the comparison](https://chatgpt.com/share/66f53751-4694-8009
 
 **Request:** _"Can you explain how the proof-of-stake consensus mechanism differs from proof-of-work in blockchain technology?"_
 
-A [detailed analysis of ChatGPT-o1](https://chatgpt.com/share/66f52038-c510-8009-b5ed-be61814b63be) on the quality of the following two responses indicates that Ditana Assistant’s [ICA](#maximizing-the-underlying-ai-models-potential) can better leverage the capabilities of the underlying LLM model:
+A [detailed analysis of ChatGPT-o1](https://chatgpt.com/share/66f52038-c510-8009-b5ed-be61814b63be) on the quality of the following two responses indicates that Ditana Assistant's [ICA](#maximizing-the-underlying-ai-models-potential) can better leverage the capabilities of the underlying LLM model:
 
 > Between the two answers, Answer 2 is of higher quality. It offers a **more comprehensive and structured** comparison of the proof-of-stake and proof-of-work consensus mechanisms. By organizing the information into key points, it enhances readability and makes it easier to understand the distinct differences. Additionally, Answer 2 covers **extra dimensions** such as centralization and the economic incentives that promote security in PoS, providing a **more thorough explanation** that directly relates to the question.
 
@@ -884,7 +999,7 @@ Thank you for your support!
 
 ## Current Project Status
 
-Ditana Assistant is currently in active development. Here’s an overview of its current status across different platforms and features:
+Ditana Assistant is currently in active development. Here's an overview of its current status across different platforms and features:
 
 ### Platform Support
 
@@ -924,22 +1039,23 @@ Please note that while we strive for stability, Ditana Assistant is still evolvi
 ## Important Notes
 
 - The assistant may suggest terminal commands, which are only executed after user confirmation.
-- Due to the use of LLMs, there’s a possibility of errors. Always review suggested commands before execution.
-- When using the local KoboldCpp server, the [Instruct Tag Format](https://ai.google.dev/gemma/docs/formatting) is optimized for the Gemma language model.
+- Due to the use of LLMs, there's a possibility of errors. Always review suggested commands before execution.
+- When using KoboldCpp with the Gemma model (`model_type: gemma`), the [Instruct Tag Format](https://ai.google.dev/gemma/docs/formatting) is used for Gemma-specific prompt formatting.
 - API Usage and Performance:
   - Ditana Assistant may send multiple API requests per user prompt, depending on which features are enabled in `config.py` (see [Core Functionality Settings](#core-functionality-settings)). Key features affecting API usage include:
     - `generate_terminal_cmd`
     - `wolfram_alpha_short_answers_app_id`
   - Using the `-a` or `--augmentation` command-line option significantly increases the number of API calls (see [Command-line Interface](#command-line-interface)).
   - More API calls result in longer response times and potentially higher costs for paid services like OpenAI.
-    As of October 2024, the cost for OpenAI's `gpt-4-mini` model is [$0.150 / 1M input tokens](https://openai.com/api/pricing).
+    As of October 2024, the cost for OpenAI's `gpt-4o-mini` model is [$0.150 / 1M input tokens](https://openai.com/api/pricing).
+    Local providers like Ollama have no per-query cost.
 
-We are committed to continuously improving Ditana Assistant’s performance, accuracy, and feature set.
+We are committed to continuously improving Ditana Assistant's performance, accuracy, and feature set.
 Your feedback and contributions are invaluable in this process.
 
 ## Feedback and Support
 
-Your insights are crucial to shaping Ditana Assistant’s future. We invite you to share your feedback, report issues, and engage with other users in our [Ditana Assistant Discord channel](https://discord.gg/A3CdBXxush). Join our community to collaborate, ask questions, and stay updated with the latest developments.
+Your insights are crucial to shaping Ditana Assistant's future. We invite you to share your feedback, report issues, and engage with other users in our [Ditana Assistant Discord channel](https://discord.gg/A3CdBXxush). Join our community to collaborate, ask questions, and stay updated with the latest developments.
 
 ## Licensing
 
@@ -954,5 +1070,5 @@ For commercial licensing inquiries, please contact us at [https://acrion.ch/sale
 
 ## Author
 
-Copyright © 2024, 2025 Stefan Zipproth, acrion innovations GmbH, Switzerland
+Copyright © 2024, 2025, 2026 Stefan Zipproth, acrion innovations GmbH, Switzerland
 [https://ditana.org](https://ditana.org)

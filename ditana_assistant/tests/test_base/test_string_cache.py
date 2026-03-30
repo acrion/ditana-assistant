@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -40,11 +40,11 @@ These tests ensure that the StringCache class behaves correctly under different 
 and maintains data integrity across multiple instances and file operations.
 """
 
-import unittest
-import time
-import tempfile
 import json
 import os
+import tempfile
+import time
+import unittest
 from pathlib import Path
 from typing import Dict, Tuple
 
@@ -70,14 +70,14 @@ These tests ensure that the StringCache class behaves correctly under different 
 and maintains data integrity across multiple instances and file operations.
 """
 
-import unittest
-import time
-import tempfile
 import json
+import logging
 import os
 import random
 import string
-import logging
+import tempfile
+import time
+import unittest
 from pathlib import Path
 from typing import Dict, Tuple
 
@@ -127,18 +127,21 @@ class TestStringCache(unittest.TestCase):
     def test_priority_cache(self) -> None:
         """Test the priority cache functionality."""
         # Create a temporary file for the priority cache
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as temp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".json"
+        ) as temp_file:
             # Create a cache and set some values
             temp_cache = string_cache.StringCache("temp-cache", default_lifetime=1000)
             temp_cache.set("priority_key", "priority_value")
 
             # Copy the contents of the cache file to the temporary file
-            with open(temp_cache.file_path, 'r') as source_file:
+            with open(temp_cache.file_path, "r") as source_file:
                 temp_file.write(source_file.read())
 
         # Create a new cache with the priority cache file
-        priority_cache = string_cache.StringCache("unit-test", default_lifetime=0.5,
-                                                  priority_cache_path=Path(temp_file.name))
+        priority_cache = string_cache.StringCache(
+            "unit-test", default_lifetime=0.5, priority_cache_path=Path(temp_file.name)
+        )
 
         # Test that the priority cache entry is accessible
         self.assertEqual(priority_cache.get("priority_key"), "priority_value")
@@ -153,12 +156,16 @@ class TestStringCache(unittest.TestCase):
     def test_max_size_limit(self) -> None:
         """Test that the cache respects the maximum size limit."""
         # Set a small max_size for testing
-        small_cache = string_cache.StringCache("unit-test", default_lifetime=0.5, max_size=100)
+        small_cache = string_cache.StringCache(
+            "unit-test", default_lifetime=0.5, max_size=100
+        )
 
         # Add entries until we exceed the limit
         for i in range(10):
             key = f"key{i}"
-            value = f"value{i}" * 5  # Make the value long enough to exceed the limit quickly
+            value = (
+                f"value{i}" * 5
+            )  # Make the value long enough to exceed the limit quickly
             small_cache.set(key, value)
 
         # Check that the cache size is below or equal to the max_size
@@ -210,11 +217,13 @@ class TestStringCache(unittest.TestCase):
     def test_stress(self) -> None:
         """Stress test the cache with random key/value pairs."""
         # Create a new cache with a larger max_size for stress testing
-        stress_cache = string_cache.StringCache("stress-test", default_lifetime=60, max_size=1024 * 1024)  # 1 MiB
+        stress_cache = string_cache.StringCache(
+            "stress-test", default_lifetime=60, max_size=1024 * 1024
+        )  # 1 MiB
 
         # Generate random key/value pairs
         def random_string(length: int) -> str:
-            return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+            return "".join(random.choice(string.ascii_letters) for _ in range(length))
 
         num_operations = 1000
         keys = [random_string(10) for _ in range(num_operations)]
@@ -230,9 +239,9 @@ class TestStringCache(unittest.TestCase):
 
         # Perform mixed set and get operations
         for _ in range(num_operations):
-            operation = random.choice(['set', 'get'])
+            operation = random.choice(["set", "get"])
             key = random.choice(keys)
-            if operation == 'set':
+            if operation == "set":
                 new_value = random_string(50)
                 stress_cache.set(key, new_value)
             else:
@@ -245,5 +254,5 @@ class TestStringCache(unittest.TestCase):
         stress_cache.clear()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

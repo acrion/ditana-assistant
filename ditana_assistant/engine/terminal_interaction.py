@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -28,14 +28,18 @@ When the application runs with a GUI, this module handles terminal commands
 that may be required during the conversation.
 """
 
-from ditana_assistant.gui.assistant_window import AssistantWindow
 from ditana_assistant.base import terminal
-
 from ditana_assistant.engine import text_processors_regex
 from ditana_assistant.engine.conversation_manager import ConversationManager
+from ditana_assistant.gui.assistant_window import AssistantWindow
 
 
-def terminal_thread(conversation: ConversationManager, window: AssistantWindow, user_input: str, quiet: bool) -> None:
+def terminal_thread(
+    conversation: ConversationManager,
+    window: AssistantWindow,
+    user_input: str,
+    quiet: bool,
+) -> None:
     """
     Manages the terminal-based interaction loop for the Ditana Assistant.
 
@@ -69,7 +73,9 @@ def terminal_thread(conversation: ConversationManager, window: AssistantWindow, 
                         if user_input.strip() == "":
                             ConversationManager.stop_thread().set()
                             break
-                assistant_answer, code = conversation.process_input(user_input, meta_call=False)
+                assistant_answer, code = conversation.process_input(
+                    user_input, meta_call=False
+                )
 
             if not quiet:
                 print()
@@ -77,11 +83,13 @@ def terminal_thread(conversation: ConversationManager, window: AssistantWindow, 
             if code:
                 print(code)
                 reply = terminal.get_valid_input("Execute above command?")
-                if reply == 'n':
+                if reply == "n":
                     user_input = "I do not execute this command."
                     conversation.append_user_message(user_input)
                     if window.is_open:
-                        window.set_ui_response(text_processors_regex.add_markdown_italics(user_input+"_"))
+                        window.set_ui_response(
+                            text_processors_regex.add_markdown_italics(user_input + "_")
+                        )
                         print("Ok, please focus the UI window.")
                         continue
                     else:
@@ -91,7 +99,11 @@ def terminal_thread(conversation: ConversationManager, window: AssistantWindow, 
                 user_input = execute_code(code, conversation, window)
             else:
                 if window.is_open:
-                    window.set_ui_response(text_processors_regex.ensure_markdown_horizontal_line(assistant_answer))
+                    window.set_ui_response(
+                        text_processors_regex.ensure_markdown_horizontal_line(
+                            assistant_answer
+                        )
+                    )
                     print("I answered in the UI window - please focus it.")
                 else:
                     print(assistant_answer)
@@ -101,7 +113,9 @@ def terminal_thread(conversation: ConversationManager, window: AssistantWindow, 
             print(e)
 
 
-def execute_code(code: str, conversation: ConversationManager, window: AssistantWindow) -> str:
+def execute_code(
+    code: str, conversation: ConversationManager, window: AssistantWindow
+) -> str:
     """
     Execute a given code command and handle its output.
 
@@ -125,7 +139,9 @@ def execute_code(code: str, conversation: ConversationManager, window: Assistant
         - Prompts the user for action if the command fails in terminal-only mode.
     """
     if window.is_open:
-        window.set_ui_response(text_processors_regex.ensure_markdown_horizontal_line(code))
+        window.set_ui_response(
+            text_processors_regex.ensure_markdown_horizontal_line(code)
+        )
 
     return_code, output = terminal.run_interactive_command(code)
 
@@ -134,7 +150,9 @@ def execute_code(code: str, conversation: ConversationManager, window: Assistant
 {output}"""
 
         if window.is_open:
-            window.set_ui_response(text_processors_regex.add_markdown_italics(user_input + "_"))
+            window.set_ui_response(
+                text_processors_regex.add_markdown_italics(user_input + "_")
+            )
             conversation.append_user_message(user_input)
         else:
             conversation.append_user_message(user_input)
@@ -146,13 +164,15 @@ def execute_code(code: str, conversation: ConversationManager, window: Assistant
         if window.is_open:
             window.set_ui_input(user_input)
         else:
-            reply = terminal.get_valid_input(f"The command failed with return code {return_code}. Do you want me to try to fix it?")
+            reply = terminal.get_valid_input(
+                f"The command failed with return code {return_code}. Do you want me to try to fix it?"
+            )
 
             # If the user responds with 'y', the error message in user_input will be automatically used
             # by terminal_thread as the next user message, prompting the assistant to attempt a fix.
             # If the response is 'n', we manually add the error message to the conversation history
             # and clear user_input to prevent terminal_thread from automatically proceeding.
-            if reply == 'n':
+            if reply == "n":
                 conversation.append_user_message(user_input)
                 user_input = ""
 

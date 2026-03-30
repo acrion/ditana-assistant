@@ -1,0 +1,8 @@
+[
+  {
+    "label": "Debug ditana-assistant",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "program": "ditana_assistant/engine/__main__.py",
+  },
+]

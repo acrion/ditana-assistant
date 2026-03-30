@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -29,17 +29,17 @@ in a text. All of these functions make use of the LLM. The parallel module
 """
 
 import re
-from typing import Optional, List, Dict, Literal
+from typing import Dict, List, Literal, Optional
 
-from ditana_assistant.base.output_manager import OutputManager
 from ditana_assistant.base import config
 from ditana_assistant.base.config import Configuration
+from ditana_assistant.base.output_manager import OutputManager
+from ditana_assistant.engine import input_analyzers_regex, text_processors_ai
 
-from ditana_assistant.engine import input_analyzers_regex
-from ditana_assistant.engine import text_processors_ai
 
-
-def answers_yes(query: str, messages: Optional[List[Dict[Literal["role", "content"], str]]] = None) -> bool:
+def answers_yes(
+    query: str, messages: Optional[List[Dict[Literal["role", "content"], str]]] = None
+) -> bool:
     """
     Determine if the AI’s response to a query is affirmative.
 
@@ -51,11 +51,12 @@ def answers_yes(query: str, messages: Optional[List[Dict[Literal["role", "conten
         bool: True if the response is affirmative, False otherwise.
     """
     from ditana_assistant.engine.conversation_manager import ConversationManager
+
     assistant_answer = ConversationManager(messages).process_input(query)[0].lower()
 
     OutputManager.print_formatted(query, assistant_answer)
 
-    return bool(re.search(r'\byes\b', assistant_answer))
+    return bool(re.search(r"\byes\b", assistant_answer))
 
 
 def is_language(txt: str, lang: str) -> bool:
@@ -69,7 +70,7 @@ def is_language(txt: str, lang: str) -> bool:
     Returns:
         bool: True if the text is in the specified language, False otherwise.
     """
-    if Configuration.get()['ASSUME_ENGLISH'] and lang == "English":
+    if Configuration.get()["ASSUME_ENGLISH"] and lang == "English":
         return True
 
     result = answers_yes(f'''Is the following text 100% in {lang}? Answer with "yes" or "no" only:
@@ -80,7 +81,9 @@ def is_language(txt: str, lang: str) -> bool:
     return result
 
 
-def query_refers_to_a_computer(query: str, messages: Optional[List[Dict[Literal["role", "content"], str]]] = None) -> bool:
+def query_refers_to_a_computer(
+    query: str, messages: Optional[List[Dict[Literal["role", "content"], str]]] = None
+) -> bool:
     """
     Determine if the given query can typically be solved using command line tools.
 
@@ -101,12 +104,16 @@ def query_refers_to_a_computer(query: str, messages: Optional[List[Dict[Literal[
 
     result = answers_yes(question, messages)
 
-    OutputManager.print_formatted("refers to a computer" if result else "does not refer to a computer", query)
+    OutputManager.print_formatted(
+        "refers to a computer" if result else "does not refer to a computer", query
+    )
 
     return result
 
 
-def query_is_suitable_for_wolfram_alpha(query: str, messages: List[Dict[Literal["role", "content"], str]]) -> bool:
+def query_is_suitable_for_wolfram_alpha(
+    query: str, messages: List[Dict[Literal["role", "content"], str]]
+) -> bool:
     """
     Determine if the given query is suitable for the [Wolfram|Alpha Short Answers API](https://products.wolframalpha.com/short-answers-api/documentation)
 
@@ -119,15 +126,22 @@ def query_is_suitable_for_wolfram_alpha(query: str, messages: List[Dict[Literal[
     """
     result = False
 
-    if (query != ""
-            and not input_analyzers_regex.likely_contains_multiple_sentences(query)
-            and not bool(re.search(r'\n', query.strip()))):
+    if (
+        query != ""
+        and not input_analyzers_regex.likely_contains_multiple_sentences(query)
+        and not bool(re.search(r"\n", query.strip()))
+    ):
         question = f'''Does this request refer to a single calculation, quantitative measurement, statistic or real-time information about the physical world (such as weather, stock data or population) and can it be answered without knowledge of our previous messages? Answer with "yes" or "no" only:
 
 "{query}"'''
 
         result = answers_yes(question, messages)
-        OutputManager.print_formatted("suitable for Wolfram|Alpha" if result else "not suitable for Wolfram|Alpha", query)
+        OutputManager.print_formatted(
+            "suitable for Wolfram|Alpha"
+            if result
+            else "not suitable for Wolfram|Alpha",
+            query,
+        )
 
     return result
 
@@ -146,7 +160,7 @@ def query_requires_changes_on_computer(query: str) -> bool:
     if query == "":
         return False
 
-    if Configuration.get()['MODEL_TYPE'] == config.ModelType.GEMMA:
+    if Configuration.get()["MODEL_TYPE"] == config.ModelType.GEMMA:
         # Gemma is not able to pass the unit tests when using 'Answer with "yes" or "no" only'.
         base_question = "Does this request involve modifying files or states on the computer? To what extent?"
     else:
@@ -158,13 +172,20 @@ def query_requires_changes_on_computer(query: str) -> bool:
 
     result = answers_yes(question)
 
-    OutputManager.print_formatted("requires changes on computer" if result else "does not require changes on computer", query)
+    OutputManager.print_formatted(
+        "requires changes on computer"
+        if result
+        else "does not require changes on computer",
+        query,
+    )
 
     return result
 
 
 # deprecated
-def request_is_answerable(query: str, messages: List[Dict[Literal["role", "content"], str]]) -> bool:
+def request_is_answerable(
+    query: str, messages: List[Dict[Literal["role", "content"], str]]
+) -> bool:
     """
     Determine if the given query can be answered based on the dialog held so far.
 
@@ -186,7 +207,12 @@ def request_is_answerable(query: str, messages: List[Dict[Literal["role", "conte
 
     result = answers_yes(question, messages)
 
-    OutputManager.print_formatted("previous dialog contains the answer" if result else "previous dialog does not contain the answer", query)
+    OutputManager.print_formatted(
+        "previous dialog contains the answer"
+        if result
+        else "previous dialog does not contain the answer",
+        query,
+    )
 
     return result
 
@@ -194,17 +220,19 @@ def request_is_answerable(query: str, messages: List[Dict[Literal["role", "conte
 def prompt_can_be_split(prompt: str) -> bool:
     """Determine if the given prompt can be split into two subtasks"""
 
-    return answers_yes(f'''Does it make sense to divide the following prompt into two subtasks in order to tackle them systematically?
+    return answers_yes(f"""Does it make sense to divide the following prompt into two subtasks in order to tackle them systematically?
     
 ```
 {prompt}
 ```
 
 Please answer only with "yes" or "no".
-''')
+""")
 
 
-def request_is_complex(query: str, messages: List[Dict[Literal["role", "content"], str]]) -> bool:
+def request_is_complex(
+    query: str, messages: List[Dict[Literal["role", "content"], str]]
+) -> bool:
     """
     Determines if the given request is complex.
 
@@ -218,10 +246,13 @@ def request_is_complex(query: str, messages: List[Dict[Literal["role", "content"
     if query == "":
         return False  # An empty query is not complex
 
-    result = answers_yes(f'''Does answering this prompt require skills like applying, analyzing, or evaluating information, rather than just remembering or understanding facts? Please answer only with "yes" or "no":
+    result = answers_yes(
+        f"""Does answering this prompt require skills like applying, analyzing, or evaluating information, rather than just remembering or understanding facts? Please answer only with "yes" or "no":
     ```
     {query}
-    ```''', messages)
+    ```""",
+        messages,
+    )
 
     return result
 
@@ -237,6 +268,7 @@ def are_you_sure(assistant_answer, messages) -> bool:
 
     """
     from ditana_assistant.engine.conversation_manager import ConversationManager
+
     conversation = ConversationManager(messages)
     conversation.append_assistant_message(assistant_answer)
     return answers_yes('Are you sure? Please answer only with "yes" or "no".', messages)
@@ -286,7 +318,7 @@ def is_likely_code_delegate(text):
         The behavior of this function depends on the current model type set in the Configuration.
         It's designed to provide a unified interface for code detection across different model types.
     """
-    match Configuration.get()['MODEL_TYPE']:
+    match Configuration.get()["MODEL_TYPE"]:
         case config.ModelType.OPENAI:
             return is_likely_code(text)
         case config.ModelType.GEMMA:

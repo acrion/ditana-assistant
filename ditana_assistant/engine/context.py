@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -29,17 +29,16 @@ It includes functions to determine OS information, desktop environment,
 user language, and other system-specific details.
 """
 
-from datetime import datetime
-import time
-import os
 import locale
+import os
 import platform
 import shutil
+import time
+from datetime import datetime
 from typing import Final, Optional
 
 from ditana_assistant.base.config import Configuration
-from ditana_assistant.engine import context_processes
-from ditana_assistant.engine import text_processors_ai
+from ditana_assistant.engine import context_processes, text_processors_ai
 
 
 def get_linux_info() -> str:
@@ -50,13 +49,13 @@ def get_linux_info() -> str:
         str: A string describing the Linux distribution.
     """
     try:
-        with open('/etc/os-release', 'r', encoding='utf-8') as f:
-            os_release = dict(line.strip().split('=', 1) for line in f if '=' in line)
+        with open("/etc/os-release", "r", encoding="utf-8") as f:
+            os_release = dict(line.strip().split("=", 1) for line in f if "=" in line)
 
-        id_like = os_release.get('ID_LIKE', '').strip('"')
-        pretty_name = os_release.get('PRETTY_NAME', '').strip('"')
+        id_like = os_release.get("ID_LIKE", "").strip('"')
+        pretty_name = os_release.get("PRETTY_NAME", "").strip('"')
 
-        if id_like and id_like.lower() != 'n/a':
+        if id_like and id_like.lower() != "n/a":
             return id_like + " Linux"
         else:
             return pretty_name + " Linux"
@@ -101,7 +100,7 @@ def get_desktop_environment() -> str:
     Returns:
         str: The name of the current desktop environment, or an empty string if not available.
     """
-    return os.environ.get('XDG_CURRENT_DESKTOP', '')
+    return os.environ.get("XDG_CURRENT_DESKTOP", "")
 
 
 def get_shell() -> str:
@@ -114,7 +113,7 @@ def get_shell() -> str:
     if os.getenv("SHELL"):
         return "bash"
     elif os.getenv("PROMPT"):
-        return 'cmd.exe (Windows Batch)'
+        return "cmd.exe (Windows Batch)"
     else:
         return "PowerShell"
 
@@ -126,10 +125,10 @@ def get_comment_identifier() -> str:
     Returns:
         str: The comment identifier (e.g., '#' or 'REM').
     """
-    if get_shell() == 'cmd.exe (Windows Batch)':
-        return 'REM'
+    if get_shell() == "cmd.exe (Windows Batch)":
+        return "REM"
     else:
-        return '#'
+        return "#"
 
 
 def get_terminal() -> Optional[str]:
@@ -171,14 +170,14 @@ def get_open_command() -> Optional[str]:
     Returns:
         str: The command to open files or URLs, or None if not available.
     """
-    if platform.system() == 'Darwin':
-        return 'open'
-    elif platform.system() == 'Windows':
-        return 'start'
-    elif get_desktop_environment() == 'XFCE':
-        return 'exo-open'
-    elif shutil.which('xdg-open'):
-        return 'xdg-open'
+    if platform.system() == "Darwin":
+        return "open"
+    elif platform.system() == "Windows":
+        return "start"
+    elif get_desktop_environment() == "XFCE":
+        return "exo-open"
+    elif shutil.which("xdg-open"):
+        return "xdg-open"
     else:
         return None
 
@@ -226,86 +225,86 @@ def get_user_language() -> str:
         str: The user’s language
     """
 
-    if Configuration.get()['ASSUME_ENGLISH']:
+    if Configuration.get()["ASSUME_ENGLISH"]:
         return "English"
 
     locale_dict: Final = {
-        'aa': 'Afar',
-        'af': 'Afrikaans',
-        'an': 'Aragonese',
-        'ar': 'Arabic',
-        'ast': 'Asturian',
-        'be': 'Belarusian',
-        'bg': 'Bulgarian',
-        'bhb': 'Bhili',
-        'br': 'Breton',
-        'bs': 'Bosnian',
-        'ca': 'Catalan',
-        'cs': 'Czech',
-        'cy': 'Welsh',
-        'da': 'Danish',
-        'de': 'German',
-        'el': 'Greek',
-        'en': 'English',
-        'es': 'Spanish',
-        'et': 'Estonian',
-        'eu': 'Basque',
-        'fi': 'Finnish',
-        'fo': 'Faroese',
-        'fr': 'French',
-        'ga': 'Irish',
-        'gd': 'Scots',
-        'gl': 'Galician',
-        'gv': 'Manx',
-        'he': 'Hebrew',
-        'hr': 'Croatian',
-        'hsb': 'Upper',
-        'hu': 'Hungarian',
-        'id': 'Indonesian',
-        'is': 'Icelandic',
-        'it': 'Italian',
-        'ja': 'Japanese',
-        'ka': 'Georgian',
-        'kk': 'Kazakh',
-        'kl': 'Greenlandic',
-        'ko': 'Korean',
-        'ku': 'Kurdish',
-        'kw': 'Cornish',
-        'lg': 'Luganda',
-        'lt': 'Lithuanian',
-        'lv': 'Latvian',
-        'mg': 'Malagasy',
-        'mi': 'Maori',
-        'mk': 'Macedonian',
-        'ms': 'Malay',
-        'mt': 'Maltese',
-        'nb': 'Norwegian',
-        'nl': 'Dutch',
-        'nn': 'Nynorsk',
-        'oc': 'Occitan',
-        'om': 'Oromo',
-        'pl': 'Polish',
-        'pt': 'Portuguese',
-        'ro': 'Romanian',
-        'ru': 'Russian',
-        'sk': 'Slovak',
-        'sl': 'Slovenian',
-        'so': 'Somali',
-        'sq': 'Albanian',
-        'st': 'Sotho',
-        'sv': 'Swedish',
-        'tcy': 'Tulu',
-        'tg': 'Tajik',
-        'th': 'Thai',
-        'tl': 'Tagalog',
-        'tr': 'Turkish',
-        'uk': 'Ukrainian',
-        'uz': 'Uzbek',
-        'wa': 'Walloon',
-        'xh': 'Xhosa',
-        'yi': 'Yiddish',
-        'zh': 'Chinese',
-        'zu': 'Zulu',
+        "aa": "Afar",
+        "af": "Afrikaans",
+        "an": "Aragonese",
+        "ar": "Arabic",
+        "ast": "Asturian",
+        "be": "Belarusian",
+        "bg": "Bulgarian",
+        "bhb": "Bhili",
+        "br": "Breton",
+        "bs": "Bosnian",
+        "ca": "Catalan",
+        "cs": "Czech",
+        "cy": "Welsh",
+        "da": "Danish",
+        "de": "German",
+        "el": "Greek",
+        "en": "English",
+        "es": "Spanish",
+        "et": "Estonian",
+        "eu": "Basque",
+        "fi": "Finnish",
+        "fo": "Faroese",
+        "fr": "French",
+        "ga": "Irish",
+        "gd": "Scots",
+        "gl": "Galician",
+        "gv": "Manx",
+        "he": "Hebrew",
+        "hr": "Croatian",
+        "hsb": "Upper",
+        "hu": "Hungarian",
+        "id": "Indonesian",
+        "is": "Icelandic",
+        "it": "Italian",
+        "ja": "Japanese",
+        "ka": "Georgian",
+        "kk": "Kazakh",
+        "kl": "Greenlandic",
+        "ko": "Korean",
+        "ku": "Kurdish",
+        "kw": "Cornish",
+        "lg": "Luganda",
+        "lt": "Lithuanian",
+        "lv": "Latvian",
+        "mg": "Malagasy",
+        "mi": "Maori",
+        "mk": "Macedonian",
+        "ms": "Malay",
+        "mt": "Maltese",
+        "nb": "Norwegian",
+        "nl": "Dutch",
+        "nn": "Nynorsk",
+        "oc": "Occitan",
+        "om": "Oromo",
+        "pl": "Polish",
+        "pt": "Portuguese",
+        "ro": "Romanian",
+        "ru": "Russian",
+        "sk": "Slovak",
+        "sl": "Slovenian",
+        "so": "Somali",
+        "sq": "Albanian",
+        "st": "Sotho",
+        "sv": "Swedish",
+        "tcy": "Tulu",
+        "tg": "Tajik",
+        "th": "Thai",
+        "tl": "Tagalog",
+        "tr": "Turkish",
+        "uk": "Ukrainian",
+        "uz": "Uzbek",
+        "wa": "Walloon",
+        "xh": "Xhosa",
+        "yi": "Yiddish",
+        "zh": "Chinese",
+        "zu": "Zulu",
     }
 
     lang_code: Final = get_temporal_locale_identifier()
@@ -334,10 +333,14 @@ def get_system_timezone():
         For more information about the historical context and complexities of Windows timezones:
         https://superuser.com/questions/1709147/history-explanation-for-time-zones-on-windows
     """
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         try:
             import winreg
-            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\TimeZoneInformation") as key:
+
+            with winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SYSTEM\CurrentControlSet\Control\TimeZoneInformation",
+            ) as key:
                 tz_name = winreg.QueryValueEx(key, "TimeZoneKeyName")[0]
             return tz_name
         except OSError:
@@ -366,12 +369,14 @@ def generate_initial_context() -> str:
 
     running_desktop_applications = context_processes.get_process_info().strip()
 
-    initial_command += f". It is currently {datetime.now().strftime('%A, %B %d, %Y at %H o\'clock')} ({local_tz} time zone)."
+    initial_command += f". It is currently {datetime.now().strftime("%A, %B %d, %Y at %H o'clock")} ({local_tz} time zone)."
 
     if running_desktop_applications != "":
         initial_command += " The following desktop applications are running:"
 
-    initial_command = text_processors_ai.translate_from_defined_language("English", user_language, initial_command)
+    initial_command = text_processors_ai.translate_from_defined_language(
+        "English", user_language, initial_command
+    )
 
     if running_desktop_applications != "":
         initial_command += "\n\n" + running_desktop_applications

@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -43,9 +43,11 @@ def add_markdown_italics(text: str) -> str:
     Returns:
         str: The text with markdown italics formatting applied.
     """
-    lines = text.split('\n')
-    modified_lines = ['_' + line.strip() + '_' if line.strip() else line for line in lines]
-    return '\n\n'.join(modified_lines)
+    lines = text.split("\n")
+    modified_lines = [
+        "_" + line.strip() + "_" if line.strip() else line for line in lines
+    ]
+    return "\n\n".join(modified_lines)
 
 
 def ensure_markdown_horizontal_line(text: str) -> str:
@@ -61,15 +63,15 @@ def ensure_markdown_horizontal_line(text: str) -> str:
     Returns:
         str: The text with a markdown horizontal line at the end.
     """
-    valid_patterns = ['---', '***', '___']
-    lines = text.strip().split('\n')
+    valid_patterns = ["---", "***", "___"]
+    lines = text.strip().split("\n")
     if lines and lines[-1].strip() in valid_patterns:
         return text
     if lines and lines[-1].strip():
-        lines.append('')
-    lines.append('---')
-    lines.append('')
-    return '\n'.join(lines)
+        lines.append("")
+    lines.append("---")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def remove_comments(text: str) -> str:
@@ -85,7 +87,7 @@ def remove_comments(text: str) -> str:
     comment_identifier = context.get_comment_identifier()
     result_lines = []
 
-    for line in text.split('\n'):
+    for line in text.split("\n"):
         stripped_line = line.strip()
         if not stripped_line.startswith(comment_identifier):
             if comment_identifier in line:
@@ -93,7 +95,7 @@ def remove_comments(text: str) -> str:
             if line.strip():
                 result_lines.append(line)
 
-    return '\n'.join(result_lines)
+    return "\n".join(result_lines)
 
 
 def edit_output_for_terminal(assistant_answer: str) -> str:
@@ -112,14 +114,14 @@ def edit_output_for_terminal(assistant_answer: str) -> str:
     """
     code = assistant_answer.strip()
 
-    code = re.sub(r'^```.*?$', '', code, flags=re.MULTILINE)
-    code = re.sub(r'^\s*$\n', '', code, flags=re.MULTILINE)
-    code = re.sub(r'^`', '', code, flags=re.MULTILINE)
-    code = re.sub(r'`.*$', '', code, flags=re.MULTILINE)
-    code = re.sub(r'^\s*powershell\s*$', '', code, flags=re.MULTILINE | re.IGNORECASE)
+    code = re.sub(r"^```.*?$", "", code, flags=re.MULTILINE)
+    code = re.sub(r"^\s*$\n", "", code, flags=re.MULTILINE)
+    code = re.sub(r"^`", "", code, flags=re.MULTILINE)
+    code = re.sub(r"`.*$", "", code, flags=re.MULTILINE)
+    code = re.sub(r"^\s*powershell\s*$", "", code, flags=re.MULTILINE | re.IGNORECASE)
 
-    if re.match(r'^#\s*[a-z]', code) and code.count('\n') <= 1:
-        code = code.lstrip('#').lstrip()
+    if re.match(r"^#\s*[a-z]", code) and code.count("\n") <= 1:
+        code = code.lstrip("#").lstrip()
 
     if code.startswith("'") and code.endswith("'"):
         code = code[1:-1]
@@ -147,7 +149,9 @@ def remove_words_and_phrases(input_text, remove_string, new_string):
     str: Processed text with specified words and phrases removed.
     """
     # First, remove the entire remove_string if it exists
-    input_text = re.sub(r'\b' + re.escape(remove_string) + r'\b', new_string, input_text)
+    input_text = re.sub(
+        r"\b" + re.escape(remove_string) + r"\b", new_string, input_text
+    )
 
     # Split the remove_string into words
     remove_words = remove_string.split()
@@ -155,12 +159,14 @@ def remove_words_and_phrases(input_text, remove_string, new_string):
     # Generate all possible combinations of words, from longest to shortest
     for length in range(len(remove_words), 0, -1):
         for i in range(len(remove_words) - length + 1):
-            phrase = " ".join(remove_words[i:i+length])
+            phrase = " ".join(remove_words[i : i + length])
             if len(phrase) >= 4:
-                input_text = re.sub(r'\b' + re.escape(phrase) + r'\b', new_string, input_text)
+                input_text = re.sub(
+                    r"\b" + re.escape(phrase) + r"\b", new_string, input_text
+                )
 
     # Remove any double spaces that might have been created
-    input_text = re.sub(r'\s+', ' ', input_text)
+    input_text = re.sub(r"\s+", " ", input_text)
 
     # Trim leading and trailing whitespace
     return input_text.strip()
@@ -188,7 +194,7 @@ def split_multiline_string(input_string):
     ['first part (see below)', 'second part', 'third part']
     """
     # Define the pattern: round brackets with any content except spaces and newlines
-    pattern = r'\(\d+\)'
+    pattern = r"\(\d+\)"
 
     # Find all occurrences of the pattern
     separators = list(re.finditer(pattern, input_string))
@@ -240,25 +246,25 @@ def extract_backtick_content(text: str):
     stripped_text = text.strip()
 
     # Find the first backtick from the left
-    left_index = stripped_text.find('`')
+    left_index = stripped_text.find("`")
     if left_index == -1:
         return stripped_text
 
     # Find consecutive backticks from the left
-    while left_index + 1 < len(stripped_text) and stripped_text[left_index + 1] == '`':
+    while left_index + 1 < len(stripped_text) and stripped_text[left_index + 1] == "`":
         left_index += 1
 
     # Find the first backtick from the right
-    right_index = stripped_text.rfind('`')
+    right_index = stripped_text.rfind("`")
     if right_index == left_index:
         return stripped_text
 
     # Find consecutive backticks from the right
-    while right_index > left_index and stripped_text[right_index - 1] == '`':
+    while right_index > left_index and stripped_text[right_index - 1] == "`":
         right_index -= 1
 
     # Extract and strip the content between backticks
-    extracted_content = stripped_text[left_index + 1:right_index].strip()
+    extracted_content = stripped_text[left_index + 1 : right_index].strip()
 
     # Return the extracted content if not empty, otherwise return the entire stripped text
     return extracted_content if extracted_content else stripped_text

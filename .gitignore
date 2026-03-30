@@ -7,3 +7,4 @@ __pycache__
 tmp
 test.sh
 requirements.txt
+/dist/

@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -84,7 +84,9 @@ class TestIsLikelyCode(unittest.TestCase):
             print(f"Maximum score for 'false' results: {max_false_score}")
 
             if difference < 0:
-                print("Optimum threshold: Some tests failed, calculation does not make sense.")
+                print(
+                    "Optimum threshold: Some tests failed, calculation does not make sense."
+                )
             else:
                 print(f"Optimum threshold: {(min_true_score + max_false_score) / 2}")
 
@@ -101,5 +103,5 @@ class TestIsLikelyCode(unittest.TestCase):
             print(f"Test {'passed' if result == expected_result else 'failed'}\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

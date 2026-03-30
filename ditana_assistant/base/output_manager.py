@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -45,7 +45,7 @@ def truncate_string(input_string: str, max_length: int = 100) -> str:
     if len(input_string) <= max_length:
         return input_string
     else:
-        return input_string[:max_length-3] + '...'
+        return input_string[: max_length - 3] + "..."
 
 
 class OutputManager:
@@ -68,8 +68,8 @@ class OutputManager:
             prefix (str): The prefix for the message.
             message (str): The main content of the message.
         """
-        message = message.replace('\n', ' ')
-        output = f"   {truncate_string(prefix, cls.left_size).rjust(cls.left_size)}: \"{truncate_string(message, cls.right_size)}\""
+        message = message.replace("\n", " ")
+        output = f'   {truncate_string(prefix, cls.left_size).rjust(cls.left_size)}: "{truncate_string(message, cls.right_size)}"'
         if not cls.hide_messages and output not in cls.output_history:
             print(output)
             cls.output_history[output] = True

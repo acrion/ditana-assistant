@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -30,11 +30,8 @@ import unittest
 
 from ditana_assistant.base.config import Configuration, ModelType
 from ditana_assistant.base.output_manager import OutputManager
-
-from ditana_assistant.engine import context
-from ditana_assistant.engine import input_analyzers_ai
+from ditana_assistant.engine import context, input_analyzers_ai
 from ditana_assistant.engine.conversation_manager import ConversationManager
-
 
 OutputManager.hide_messages = True
 
@@ -51,7 +48,9 @@ class TestRequestIsAnswerable(unittest.TestCase):
     def setUpClass(cls):
         cls.model_types = [ModelType.GEMMA, ModelType.OPENAI]
         cls.conversation = ConversationManager()
-        cls.conversation.append_user_message('Ich arbeite auf Arch Linux mit XFCE und Kitty. Es ist derzeit Montag, der 23. September 2024 um 14:00 Uhr. Die folgenden Desktop-Anwendungen sind geöffnet:\n\nxfce4-panel\nxfdesktop  Desktop\n/usr/share/pycharm/jbr//bin/java  003-ditana-assistant – input_analyzers_ai_test.py\n/usr/lib/chromium/chromium Claude -\n/usr/share/pycharm/jbr//bin/java  /media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/src/input_analyzers_ai.py')
+        cls.conversation.append_user_message(
+            "Ich arbeite auf Arch Linux mit XFCE und Kitty. Es ist derzeit Montag, der 23. September 2024 um 14:00 Uhr. Die folgenden Desktop-Anwendungen sind geöffnet:\n\nxfce4-panel\nxfdesktop  Desktop\n/usr/share/pycharm/jbr//bin/java  003-ditana-assistant – input_analyzers_ai_test.py\n/usr/lib/chromium/chromium Claude -\n/usr/share/pycharm/jbr//bin/java  /media/stefan/data/Documents/git/my-projects/acrion/ditana/packages/003-ditana-assistant/src/input_analyzers_ai.py"
+        )
 
     def run_test_for_both_models(self, test_func):
         """Run the given test function for both OpenAI and Gemma models."""
@@ -67,7 +66,11 @@ class TestRequestIsAnswerable(unittest.TestCase):
         def test_func():
             if context.get_os_info() == "Linux":
                 text = "Please check the available storage space on the drive containing the current directory."
-                self.assertFalse(input_analyzers_ai.request_is_answerable(text, self.conversation.messages))
+                self.assertFalse(
+                    input_analyzers_ai.request_is_answerable(
+                        text, self.conversation.messages
+                    )
+                )
 
         self.run_test_for_both_models(test_func)
 
@@ -77,7 +80,11 @@ class TestRequestIsAnswerable(unittest.TestCase):
         def test_func():
             if context.get_os_info() == "Linux":
                 text = "Kannst du die Informationen über meine laufenden Desktop-Anwendungen zusammenfassen?"
-                self.assertTrue(input_analyzers_ai.request_is_answerable(text, self.conversation.messages))
+                self.assertTrue(
+                    input_analyzers_ai.request_is_answerable(
+                        text, self.conversation.messages
+                    )
+                )
 
         self.run_test_for_both_models(test_func)
 
@@ -87,7 +94,11 @@ class TestRequestIsAnswerable(unittest.TestCase):
         def test_func():
             if context.get_os_info() == "Linux":
                 text = "Gib den Inhalt der Datei ~/test.txt aus."
-                self.assertFalse(input_analyzers_ai.request_is_answerable(text, self.conversation.messages))
+                self.assertFalse(
+                    input_analyzers_ai.request_is_answerable(
+                        text, self.conversation.messages
+                    )
+                )
 
         self.run_test_for_both_models(test_func)
 
@@ -117,7 +128,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
             if context.get_os_info() == "Linux":
                 text = "Is systemd-resolved running stably?"
                 self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-                self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+                self.assertFalse(
+                    input_analyzers_ai.query_requires_changes_on_computer(text)
+                )
 
         self.run_test_for_both_models(test_func)
 
@@ -127,7 +140,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
         def test_func():
             text = "Gib den Inhalt der Datei ~/test.txt aus"
             self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-            self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+            self.assertFalse(
+                input_analyzers_ai.query_requires_changes_on_computer(text)
+            )
 
         self.run_test_for_both_models(test_func)
 
@@ -138,7 +153,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
             if context.get_os_info() == "Linux":
                 text = "What are the largest files in the current directory and below?"
                 self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-                self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+                self.assertFalse(
+                    input_analyzers_ai.query_requires_changes_on_computer(text)
+                )
 
         self.run_test_for_both_models(test_func)
 
@@ -158,7 +175,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
         def test_func():
             text = "What’s my current audio device?"
             self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-            self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+            self.assertFalse(
+                input_analyzers_ai.query_requires_changes_on_computer(text)
+            )
 
         self.run_test_for_both_models(test_func)
 
@@ -178,7 +197,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
         def test_func():
             text = "Which process is consuming so much CPU time?"
             self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-            self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+            self.assertFalse(
+                input_analyzers_ai.query_requires_changes_on_computer(text)
+            )
 
         self.run_test_for_both_models(test_func)
 
@@ -188,7 +209,9 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
         def test_func():
             text = "List errors in the boot log."
             self.assertTrue(input_analyzers_ai.query_refers_to_a_computer(text))
-            self.assertFalse(input_analyzers_ai.query_requires_changes_on_computer(text))
+            self.assertFalse(
+                input_analyzers_ai.query_requires_changes_on_computer(text)
+            )
 
         self.run_test_for_both_models(test_func)
 
@@ -220,5 +243,5 @@ class TestQueryCanBeSolvedWithTerminal(unittest.TestCase):
         self.run_test_for_both_models(test_func)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

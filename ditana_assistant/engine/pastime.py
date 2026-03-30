@@ -1,4 +1,4 @@
-# Copyright (c) 2024, 2025 acrion innovations GmbH
+# Copyright (c) 2024, 2025, 2026 acrion innovations GmbH
 # Authors: Stefan Zipproth, s.zipproth@acrion.ch
 #
 # This file is part of Ditana Assistant, see https://github.com/acrion/ditana-assistant and https://ditana.org/assistant
@@ -36,14 +36,11 @@ user, so the assistant’s response is the next line of dialogue, which is then 
 to that single message.
 """
 
-from typing import List, Tuple, Optional
 import re
+from typing import List, Optional, Tuple
 
 from ditana_assistant.base.config import Configuration, ModelType
-
-from ditana_assistant.engine import context
-from ditana_assistant.engine import text_processors_ai
-from ditana_assistant.engine import text_processors_regex
+from ditana_assistant.engine import context, text_processors_ai, text_processors_regex
 
 
 class DialogContainer:
@@ -61,13 +58,22 @@ class DialogContainer:
     def __init__(self):
         """Initialize an empty dialog container."""
         from ditana_assistant.engine.conversation_manager import ConversationManager
+
         # Gemma gets confused when translating below texts (even sentence-wise). Also, translation of the dialog proves suboptimal. So we use English for Gemma.
-        self.use_user_language: bool = Configuration.get()['MODEL_TYPE'] != ModelType.GEMMA
+        self.use_user_language: bool = (
+            Configuration.get()["MODEL_TYPE"] != ModelType.GEMMA
+        )
         self._dialog_container: List[Tuple[bool, str]] = []
-        self._character_name: str = ConversationManager.impersonate() if ConversationManager.impersonate() else "Jean-Baptiste Clamence from the novel of Albert Camus"
+        self._character_name: str = (
+            ConversationManager.impersonate()
+            if ConversationManager.impersonate()
+            else "Jean-Baptiste Clamence from the novel of Albert Camus"
+        )
         self._short_name: str = get_short_name(self._character_name)
         self._translated_character_name: str = self.translate(self._character_name)
-        self._translated_short_name: str = get_short_name(self._translated_character_name)
+        self._translated_short_name: str = get_short_name(
+            self._translated_character_name
+        )
         self._user_name: str = self.translate("Stranger")
 
         self.request_for_response_of_fictional_character = self.translate(f"""This is a fictional dialog between {self._character_name} and a stranger that I wrote. \
@@ -91,12 +97,12 @@ Please just write a single suggestion for {self._short_name}’s next line of di
         Returns:
             the cleaned string
         """
-        lines = text.split('\n')
-        backtick_lines = [i for i, line in enumerate(lines) if line.strip() == '```']
+        lines = text.split("\n")
+        backtick_lines = [i for i, line in enumerate(lines) if line.strip() == "```"]
 
         if len(backtick_lines) == 2:
             start, end = backtick_lines
-            return '\n'.join(lines[start + 1:end])
+            return "\n".join(lines[start + 1 : end])
         else:
             return text
 
@@ -134,11 +140,13 @@ Please just write a single suggestion for {self._short_name}’s next line of di
         """
         from ditana_assistant.engine.conversation_manager import ConversationManager
 
-        return self.filter_response(ConversationManager().process_input(f"""```
+        return self.filter_response(
+            ConversationManager().process_input(f"""```
 {self.format_dialog()}
 ```
 
-{self.request_for_response_of_fictional_character}""")[0])
+{self.request_for_response_of_fictional_character}""")[0]
+        )
 
     def initial_line_of_fictional_character(self) -> str:
         """
@@ -152,7 +160,11 @@ Please just write a single suggestion for {self._short_name}’s next line of di
         """
         from ditana_assistant.engine.conversation_manager import ConversationManager
 
-        return self.filter_response(ConversationManager().process_input(self.request_for_initial_line_of_fictional_character)[0])
+        return self.filter_response(
+            ConversationManager().process_input(
+                self.request_for_initial_line_of_fictional_character
+            )[0]
+        )
 
     @staticmethod
     def extract_text(response):
@@ -187,7 +199,7 @@ Please just write a single suggestion for {self._short_name}’s next line of di
             return response[start:end].strip()
         else:
             # If there’s only one or no occurrence, simply remove the first prefix
-            return re.sub(pattern, '', response, count=1).strip()
+            return re.sub(pattern, "", response, count=1).strip()
 
     def filter_response(self, response) -> str:
         """
@@ -204,9 +216,14 @@ Please just write a single suggestion for {self._short_name}’s next line of di
         response = DialogContainer.extract_text(response)
         response = response.strip(' \n"')
         from ditana_assistant.engine.conversation_manager import ConversationManager
+
         if not ConversationManager.impersonate():
-            response = text_processors_regex.remove_words_and_phrases(response, self._translated_character_name, "Ditana")
-            response = text_processors_regex.remove_words_and_phrases(response, self._character_name, "Ditana")
+            response = text_processors_regex.remove_words_and_phrases(
+                response, self._translated_character_name, "Ditana"
+            )
+            response = text_processors_regex.remove_words_and_phrases(
+                response, self._character_name, "Ditana"
+            )
         return response
 
     def translate(self, text: str) -> str:
@@ -219,7 +236,9 @@ Please just write a single suggestion for {self._short_name}’s next line of di
             the translated text
         """
         if self.use_user_language:
-            return text_processors_ai.translate_from_defined_language("English", context.get_user_language(), text)
+            return text_processors_ai.translate_from_defined_language(
+                "English", context.get_user_language(), text
+            )
         else:
             return text
 
