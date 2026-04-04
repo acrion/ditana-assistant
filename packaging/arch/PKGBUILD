@@ -3,13 +3,13 @@
 
 pkgname=ditana-assistant
 pkgver=$(grep '^version\s*=\s*' ../../pyproject.toml | sed 's/^version\s*=\s*"\(.*\)"$/\1/')
-pkgrel=1
+pkgrel=2
 pkgdesc="$(grep '^description\s*=\s*' ../../pyproject.toml | sed 's/^description\s*=\s*"\(.*\)"$/\1/')"
 arch=(any)
 url="https://github.com/acrion/ditana-assistant"
 license=('AGPL-3.0-or-later AND PSF-2.0 AND BSD-3-Clause AND Apache-2.0 AND MIT AND GPL')
 conflicts=()
-depends=(python python-pywebview python-requests python-platformdirs wmctrl)
+depends=(python python-pywebview python-requests python-platformdirs python-yaml wmctrl)
 makedepends=(gzip python-poetry)
 source=(
     "file://$(pwd)/../../ditana-assistant.desktop"
