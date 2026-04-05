@@ -357,10 +357,10 @@ wolfram_alpha_short_answers_app_id: "" # https://developer.wolframalpha.com
 
 ### Using OpenAI
 
-To use OpenAI's models, set the `OPENAI_API_KEY` environment variable with your [OpenAI API key](https://platform.openai.com/account/api-keys) and configure the following:
+To use OpenAI's models, add your [OpenAI API key](https://platform.openai.com/account/api-keys) to your configuration file and adjust the settings:
 
 ```yaml
-model_type: openai
+openai_api_key: 'your-api-key-here'
 openai_base_url: https://api.openai.com
 openai_model: gpt-4o-mini
 ```
@@ -384,7 +384,7 @@ openai_base_url: https://api.example.com # replace with the provider's base URL
 openai_model: provider-specific-model-name
 ```
 
-Set the `OPENAI_API_KEY` environment variable to the API key provided by your chosen service (most providers use the same authentication scheme).
+Set `openai_api_key` in your configuration file to the API key provided by your chosen service.
 
 #### Examples
 

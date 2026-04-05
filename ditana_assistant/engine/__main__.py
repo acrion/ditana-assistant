@@ -52,27 +52,27 @@ def main():
     """
     The main function that sets up and runs the Ditana Assistant.
     """
-    if (
-        Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI
-        and not os.environ.get("OPENAI_API_KEY")
-    ):
-        base_url = Configuration.get().get("OPENAI_BASE_URL", "")
-        is_local = any(
-            host in base_url
-            for host in ("localhost", "127.0.0.1", "0.0.0.0", "[::1]")
-        )
-        if not is_local:
-            print(
-                """
-Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.
+# Replace the existing API key check block in main() with this:
 
-To get an API key:
-1. Visit https://platform.openai.com/account/api-keys
-2. Generate a new key
-3. Set it in your environment:
-   export OPENAI_API_KEY='your-api-key-here'  # Unix/Linux
-   setx OPENAI_API_KEY "your-api-key-here"    # Windows (restart terminal after)""")
-        sys.exit(1)
+    if Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI:
+        api_key = Configuration.get().get("OPENAI_API_KEY", "") or os.environ.get(
+            "OPENAI_API_KEY", ""
+        )
+        if not api_key:
+            base_url = Configuration.get().get("OPENAI_BASE_URL", "")
+            is_local = any(
+                host in base_url
+                for host in ("localhost", "127.0.0.1", "0.0.0.0", "[::1]")
+            )
+            if not is_local:
+                print(
+                    """
+Error: API key not found. Please add it to your config file:
+
+  File: ~/.config/ditana-assistant/config.yaml
+  Entry: openai_api_key: 'your-api-key-here'"""
+                )
+                sys.exit(1)
 
     parser = argparse.ArgumentParser(description="Ditana Assistant")
     parser.add_argument(

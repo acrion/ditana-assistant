@@ -54,6 +54,7 @@ class ConfigDict(TypedDict):
     MODEL_TYPE: ModelType
     SHOW_DEBUG_MESSAGES: bool
     OPENAI_MODEL: str
+    OPENAI_API_KEY: str
     OPENAI_BASE_URL: str
     KOBOLDCPP_BASE_URL: str
     WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID: str
@@ -108,6 +109,7 @@ class Configuration:
                     "MODEL_TYPE": "model_type",
                     "SHOW_DEBUG_MESSAGES": "show_debug_messages",
                     "OPENAI_MODEL": "openai_model",
+                    "OPENAI_API_KEY": "openai_api_key",
                     "OPENAI_BASE_URL": "openai_base_url",
                     "KOBOLDCPP_BASE_URL": "koboldcpp_base_url",
                     "WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID": "wolfram_alpha_short_answers_app_id",
@@ -176,6 +178,7 @@ class Configuration:
                 "model_type": self.__config["MODEL_TYPE"].value,
                 "show_debug_messages": self.__config["SHOW_DEBUG_MESSAGES"],
                 "openai_model": self.__config["OPENAI_MODEL"],
+                "openai_api_key": self.__config["OPENAI_API_KEY"],
                 "openai_base_url": self.__config["OPENAI_BASE_URL"],
                 "koboldcpp_base_url": self.__config["KOBOLDCPP_BASE_URL"],
                 "wolfram_alpha_short_answers_app_id": self.__config[
@@ -222,6 +225,7 @@ class Configuration:
         model_type: ModelType,
         show_debug_messages: bool,
         openai_model: str,
+        openai_api_key: str,
         openai_base_url: str,
         koboldcpp_base_url: str,
         wolfram_alpha_short_answers_app_id: str,
@@ -243,6 +247,10 @@ class Configuration:
             model_type (ModelType): The model type to use.
             show_debug_messages (bool): Whether to show debug messages.
             openai_model (str): In case model_type == ModelType.OPENAI, the OpenAI model to use.
+            openai_api_key (str): API key for OpenAI-compatible providers. Used in the
+                                        Authorization header as Bearer token. Not required for local
+                                        providers like Ollama. Falls back to the OPENAI_API_KEY
+                                        environment variable if empty.
             openai_base_url (str): The base URL for the OpenAI-compatible API, e.g. "https://api.openai.com"
             koboldcpp_base_url (str): In case model_type != ModelType.OPENAI, the base URL of the KoboldCpp server, e.g. "http://localhost:5001"
             wolfram_alpha_short_answers_app_id: WolframAlpha App ID for "Short Answers API", see https://developer.wolframalpha.com
@@ -280,6 +288,7 @@ class Configuration:
                 MODEL_TYPE=model_type,
                 SHOW_DEBUG_MESSAGES=show_debug_messages,
                 OPENAI_MODEL=openai_model,
+                OPENAI_API_KEY=openai_api_key,
                 OPENAI_BASE_URL=openai_base_url,
                 KOBOLDCPP_BASE_URL=koboldcpp_base_url,
                 WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID=wolfram_alpha_short_answers_app_id,
@@ -319,6 +328,7 @@ class Configuration:
         model_type: ModelType | None = None,
         show_debug_messages: bool | None = None,
         openai_model: str | None = None,
+        openai_api_key: str | None = None,
         openai_base_url: str | None = None,
         koboldcpp_base_url: str | None = None,
         wolfram_alpha_short_answers_app_id: str | None = None,
@@ -384,6 +394,9 @@ class Configuration:
             "openai_model": openai_model
             if openai_model is not None
             else current_config["OPENAI_MODEL"],
+            "openai_api_key": openai_api_key
+            if openai_api_key is not None
+            else current_config["OPENAI_API_KEY"],
             "openai_base_url": openai_base_url
             if openai_base_url is not None
             else current_config["OPENAI_BASE_URL"],
@@ -442,6 +455,7 @@ DEFAULT_CONFIG: Final[ConfigDict] = {
     "MODEL_TYPE": ModelType.OPENAI,
     "SHOW_DEBUG_MESSAGES": False,
     "OPENAI_MODEL": "phi4-mini",
+    "OPENAI_API_KEY": "",
     "OPENAI_BASE_URL": "http://localhost:11434",  # ollama
     "KOBOLDCPP_BASE_URL": "http://localhost:5001",
     "WOLFRAM_ALPHA_SHORT_ANSWERS_APP_ID": "",

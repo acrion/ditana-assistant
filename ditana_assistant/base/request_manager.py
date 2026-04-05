@@ -285,12 +285,12 @@ class RequestManager:
 
                 headers = {"Content-Type": "application/json"}
 
-                api_key = os.environ.get("OPENAI_API_KEY")
-                if (
-                    Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI
-                    and api_key
-                ):
-                    headers["Authorization"] = f"Bearer {api_key}"
+                if Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI:
+                    api_key = Configuration.get().get(
+                        "OPENAI_API_KEY", ""
+                    ) or os.environ.get("OPENAI_API_KEY", "")
+                    if api_key:
+                        headers["Authorization"] = f"Bearer {api_key}"
 
                 response = session.post(endpoint, headers=headers, json=request)
 
