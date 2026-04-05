@@ -52,10 +52,18 @@ def main():
     """
     The main function that sets up and runs the Ditana Assistant.
     """
-    if Configuration.get()[
-        "MODEL_TYPE"
-    ] == config.ModelType.OPENAI and not os.environ.get("OPENAI_API_KEY"):
-        print("""
+    if (
+        Configuration.get()["MODEL_TYPE"] == config.ModelType.OPENAI
+        and not os.environ.get("OPENAI_API_KEY")
+    ):
+        base_url = Configuration.get().get("OPENAI_BASE_URL", "")
+        is_local = any(
+            host in base_url
+            for host in ("localhost", "127.0.0.1", "0.0.0.0", "[::1]")
+        )
+        if not is_local:
+            print(
+                """
 Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.
 
 To get an API key:
