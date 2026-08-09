@@ -8,3 +8,8 @@ tmp
 test.sh
 requirements.txt
 /dist/
+# Local poetry configuration, not part of the packaged build.
+poetry.toml
+
+# Generated at runtime by open-webui; nothing here reads it.
+.webui_secret_key
