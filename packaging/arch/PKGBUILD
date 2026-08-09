@@ -2,21 +2,23 @@
 # Author: Stefan Zipproth <s.zipproth@ditana.org>
 
 pkgname=ditana-assistant
-pkgver=$(grep '^version\s*=\s*' ../../pyproject.toml | sed 's/^version\s*=\s*"\(.*\)"$/\1/')
+pkgver=$(grep '^version\s*=\s*' pyproject.toml | sed 's/^version\s*=\s*"\(.*\)"$/\1/')
 pkgrel=2
-pkgdesc="$(grep '^description\s*=\s*' ../../pyproject.toml | sed 's/^description\s*=\s*"\(.*\)"$/\1/')"
+pkgdesc="$(grep '^description\s*=\s*' pyproject.toml | sed 's/^description\s*=\s*"\(.*\)"$/\1/')"
 arch=(any)
 url="https://github.com/acrion/ditana-assistant"
 license=('AGPL-3.0-or-later AND PSF-2.0 AND BSD-3-Clause AND Apache-2.0 AND MIT AND GPL')
 conflicts=()
 depends=(python python-pywebview python-requests python-platformdirs python-yaml wmctrl)
 makedepends=(gzip python-poetry)
+# Plain names: pre-build-hook stages all of these next to this file, so the
+# package builds in a chroot where only this directory is mounted.
 source=(
-    "file://$(pwd)/../../ditana-assistant.desktop"
-    "file://$(pwd)/../../ditana-assistant.png"
-    "file://$(pwd)/../../ditana-assistant.1"
-    "file://$(pwd)/../../LICENSE"
-    "file://${pwd}/wheel-sources.tar.gz"
+    "ditana-assistant.desktop"
+    "ditana-assistant.png"
+    "ditana-assistant.1"
+    "LICENSE"
+    "wheel-sources.tar.gz"
 )
 
 sha256sums=(

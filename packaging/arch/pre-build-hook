@@ -1,11 +1,31 @@
 #!/usr/bin/env bash
+#
+# Stage everything the PKGBUILD needs into the directory the PKGBUILD lives in.
+#
+# The PKGBUILD used to reach up to the repository root with ../.. for the
+# version, the description and every source file. That only works where the
+# whole clone is present at a fixed relative position, so the package could not
+# be built in a clean chroot: there the PKGBUILD directory is mounted alone,
+# and ../.. is the container's root.
+
 set -e
+
 target_dir=$(pwd)
 cd ../..
-tar -czvf "$target_dir/wheel-sources.tar.gz" \
+
+tar -czf "$target_dir/wheel-sources.tar.gz" \
     --exclude='__pycache__' \
     pyproject.toml \
     poetry.lock \
     ditana_assistant/ \
     ditana-assistant \
     README.md
+
+# pyproject.toml carries the version and the description; the rest are the
+# package's own sources. Everything here is covered by .gitignore.
+cp pyproject.toml \
+   ditana-assistant.desktop \
+   ditana-assistant.png \
+   ditana-assistant.1 \
+   LICENSE \
+   "$target_dir/"
